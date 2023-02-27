@@ -155,30 +155,18 @@
     {%         endif -%}
     {%     endif -%}
 
-{%     if InjectHttpClient -%}
-        var client_ = _httpClient;
-{%     elsif UseHttpClientCreationMethod -%}
-        var client_ = await CreateHttpClientAsync(cancellationToken).ConfigureAwait(false);
-{%     else -%}
-        var client_ = new {{ HttpClientType }}();
-{%     endif -%}
-{%     if InjectHttpClient == false and DisposeHttpClient -%}
-        var disposeClient_ = true;
-{%     else -%}
-        var disposeClient_ = false;
-{%     endif -%}
         try
         {
            ApiStatus status = new ApiStatus();
 
 {%         if operation.IsGet -%}
-           var response_ = await client_.GetResourceFromEndpointAsync(urlBuilder_, status, cancellationToken).ConfigureAwait(false);
+           var response_ = await GetResourceFromEndpointAsync(urlBuilder_, status, cancellationToken).ConfigureAwait(false);
 {%         elsif operation.IsDelete -%}
-           var response_ = await client_.DeleteResourceFromEndpoint(request_, status, cancellationToken).ConfigureAwait(false);
+           var response_ = await DeleteResourceFromEndpoint(request_, status, cancellationToken).ConfigureAwait(false);
 {%         elsif operation.IsPost -%}
-           var response_ = await client_.PostResourceToEndpoint(urlBuilder_, JsonConvert.SerializeObject({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% endfor %}), status, cancellationToken).ConfigureAwait(false);
+           var response_ = await PostResourceToEndpoint(urlBuilder_, JsonConvert.SerializeObject({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% endfor %}), status, cancellationToken).ConfigureAwait(false);
 {%         elsif operation.IsPut -%}
-           var response_ = await client_.PutResourceToEndpoint(request_, JsonConvert.SerializeObject({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% endfor %}), status, cancellationToken).ConfigureAwait(false);
+           var response_ = await PutResourceToEndpoint(request_, JsonConvert.SerializeObject({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% endfor %}), status, cancellationToken).ConfigureAwait(false);
 {%     endif -%}
 
                var disposeResponse_ = true;
@@ -186,9 +174,9 @@
                 {
 
 {% if GeneratePrepareRequestAndProcessResponseAsAsyncMethods %}
-                    await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                    await ProcessResponseAsync(response_, cancellationToken).ConfigureAwait(false);
 {% else %}
-                    ProcessResponse(client_, response_);
+                    ProcessResponse(response_);
 {% endif %}
 
                     var status_ = (int)response_.StatusCode;
@@ -254,11 +242,6 @@
                         response_.Dispose();
                 }
             }
-        }
-        finally
-        {
-            if (disposeClient_)
-                client_.Dispose();
         }
     }
 

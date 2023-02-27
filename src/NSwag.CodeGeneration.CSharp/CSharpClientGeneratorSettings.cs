@@ -22,7 +22,7 @@ namespace NSwag.CodeGeneration.CSharp
             UseBaseUrl = false;
             HttpClientType = "System.Net.Http.HttpClient";
             WrapDtoExceptions = true;
-            DisposeHttpClient = true;
+            DisposeHttpClient = false;
             ParameterDateTimeFormat = "s";
             ParameterDateFormat = "yyyy-MM-dd";
             GenerateUpdateJsonSerializerSettingsMethod = true;
@@ -30,7 +30,7 @@ namespace NSwag.CodeGeneration.CSharp
             QueryNullValue = "";
             GenerateBaseUrlProperty = false;
             ExposeJsonSerializerSettings = false;
-            InjectHttpClient = true;
+            InjectHttpClient = false;
             ProtectedMethods = new string[0];
             GenerateSyncMethods = true;
             GeneratePrepareRequestAndProcessResponseAsAsyncMethods = true;

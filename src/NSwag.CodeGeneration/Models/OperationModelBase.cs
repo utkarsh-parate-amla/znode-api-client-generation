@@ -90,8 +90,23 @@ namespace NSwag.CodeGeneration.Models
             HttpMethod == OpenApiOperationMethod.Delete ||
             HttpMethod == OpenApiOperationMethod.Head;
 
-        /// <summary>Gets a value indicating whether the HTTP method is GET or HEAD.</summary>
-        public bool IsGetOrHead => HttpMethod == OpenApiOperationMethod.Get || HttpMethod == OpenApiOperationMethod.Head;
+		/// <summary>Gets a value indicating whether the HTTP method is GET or DELETE or HEAD.</summary>
+		public bool IsPost =>
+			HttpMethod == OpenApiOperationMethod.Post;
+		/// <summary>Gets a value indicating whether the HTTP method is GET or DELETE or HEAD.</summary>
+		public bool IsPut=>
+			HttpMethod == OpenApiOperationMethod.Put;
+
+		/// <summary>Gets a value indicating whether the HTTP method is GET or DELETE or HEAD.</summary>
+		public bool IsDelete =>
+			HttpMethod == OpenApiOperationMethod.Delete;
+
+		/// <summary>Gets a value indicating whether the HTTP method is GET or DELETE or HEAD.</summary>
+		public bool IsGet =>
+			HttpMethod == OpenApiOperationMethod.Get;
+
+		/// <summary>Gets a value indicating whether the HTTP method is GET or HEAD.</summary>
+		public bool IsGetOrHead => HttpMethod == OpenApiOperationMethod.Get || HttpMethod == OpenApiOperationMethod.Head;
 
         // TODO: Remove this (may not work correctly)
         /// <summary>Gets or sets a value indicating whether the operation has a result type (i.e. not void).</summary>

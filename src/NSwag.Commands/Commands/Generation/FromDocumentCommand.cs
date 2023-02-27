@@ -18,7 +18,7 @@ namespace NSwag.Commands.Generation
     public class FromDocumentCommand : OutputCommandBase, INotifyPropertyChanged
     {
         private string _json;
-        private string _url = "http://redocly.github.io/redoc/openapi.yaml";
+        private string _url = "https://localhost:44375/swagger/v1/swagger.json";
 
         /// <summary>Gets or sets the input Swagger specification.</summary>
         [JsonProperty("json", NullValueHandling = NullValueHandling.Ignore)]

@@ -22,7 +22,7 @@ namespace NSwag.CodeGeneration.CSharp
         {
             CSharpGeneratorSettings = new CSharpGeneratorSettings
             {
-                Namespace = "MyNamespace",
+                Namespace = "Znode.Engine.Api.Client",
                 SchemaType = SchemaType.Swagger2
             };
 

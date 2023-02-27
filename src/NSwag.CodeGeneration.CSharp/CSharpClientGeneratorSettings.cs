@@ -17,9 +17,9 @@ namespace NSwag.CodeGeneration.CSharp
             ClassName = "{controller}Client";
 
             GenerateExceptionClasses = true;
-            ExceptionClass = "ApiException";
+            ExceptionClass = "ZnodeException";
             ClientClassAccessModifier = "public";
-            UseBaseUrl = true;
+            UseBaseUrl = false;
             HttpClientType = "System.Net.Http.HttpClient";
             WrapDtoExceptions = true;
             DisposeHttpClient = true;
@@ -28,14 +28,19 @@ namespace NSwag.CodeGeneration.CSharp
             GenerateUpdateJsonSerializerSettingsMethod = true;
             UseRequestAndResponseSerializationSettings = false;
             QueryNullValue = "";
-            GenerateBaseUrlProperty = true;
+            GenerateBaseUrlProperty = false;
             ExposeJsonSerializerSettings = false;
             InjectHttpClient = true;
             ProtectedMethods = new string[0];
-        }
+            GenerateSyncMethods = true;
+            GeneratePrepareRequestAndProcessResponseAsAsyncMethods = true;
+            ClientBaseInterface = "IBaseClient";
+			ClientBaseClass = "BaseClient";
 
-        /// <summary>Gets or sets the full name of the base class.</summary>
-        public string ClientBaseClass { get; set; }
+		}
+
+		/// <summary>Gets or sets the full name of the base class.</summary>
+		public string ClientBaseClass { get; set; }
 
         /// <summary>Gets or sets the full name of the base interface.</summary>
         public string ClientBaseInterface { get; set; }

@@ -20,10 +20,10 @@ namespace NSwag.CodeGeneration
         {
             GenerateClientClasses = true;
             GenerateDtoTypes = true;
+            GenerateClientInterfaces = true;
 
-            OperationNameGenerator = new MultipleClientsFromOperationIdOperationNameGenerator();
+			OperationNameGenerator = new MultipleClientsFromFirstTagAndPathSegmentsOperationNameGenerator();
             ParameterNameGenerator = new DefaultParameterNameGenerator();
-
             GenerateResponseClasses = true;
             ResponseClass = "SwaggerResponse";
 

@@ -173,12 +173,6 @@
                 try
                 {
 
-{% if GeneratePrepareRequestAndProcessResponseAsAsyncMethods %}
-                    await ProcessResponseAsync(response_, cancellationToken).ConfigureAwait(false);
-{% else %}
-                    ProcessResponse(response_);
-{% endif %}
-
                     var status_ = (int)response_.StatusCode;
 {%     for response in operation.Responses -%}
                     if (status_ == {{ response.StatusCode }}{% if response.CheckChunkedStatusCode %} || status_ == 206{% endif %})

@@ -170,9 +170,12 @@
 {%     endif -%}
 
                var disposeResponse_ = true;
-                try
-                {
-
+            var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
+                    if (response_.Content != null && response_.Content.Headers != null)
+                    {
+                        foreach (var item_ in response_.Content.Headers)
+                            headers_[item_.Key] = item_.Value;
+                    }
                     var status_ = (int)response_.StatusCode;
 {%     for response in operation.Responses -%}
                     if (status_ == {{ response.StatusCode }}{% if response.CheckChunkedStatusCode %} || status_ == 206{% endif %})
@@ -229,15 +232,16 @@
                         throw new {{ ExceptionClass }}("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                     }
 {%     endif -%}
-                }
-                finally
-                {
+                
+            }
+       finally
+            {
                     if (disposeResponse_)
                         response_.Dispose();
-                }
             }
         }
-    }
+
+    
 
 {% endfor %}
     protected struct ObjectResponseResult<T>

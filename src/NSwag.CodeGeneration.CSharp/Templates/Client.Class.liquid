@@ -154,22 +154,23 @@
        urlBuilder_.Append(BuildEndpointQueryString({% for parameter in operation.QueryParameters %} {{parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %}));
     {%         endif -%}
     {%     endif -%}
+     HttpResponseMessage  response_ = null;
+     var disposeResponse_ = true;
 
         try
         {
            ApiStatus status = new ApiStatus();
 
 {%         if operation.IsGet -%}
-           var response_ = await GetResourceFromEndpointAsync(urlBuilder_, status, cancellationToken).ConfigureAwait(false);
+           response_ = await GetResourceFromEndpointAsync(urlBuilder_, status, cancellationToken).ConfigureAwait(false);
 {%         elsif operation.IsDelete -%}
-           var response_ = await DeleteResourceFromEndpoint(request_, status, cancellationToken).ConfigureAwait(false);
+            response_ = await DeleteResourceFromEndpoint(request_, status, cancellationToken).ConfigureAwait(false);
 {%         elsif operation.IsPost -%}
-           var response_ = await PostResourceToEndpoint(urlBuilder_, JsonConvert.SerializeObject({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% endfor %}), status, cancellationToken).ConfigureAwait(false);
+           response_ = await PostResourceToEndpoint(urlBuilder_, JsonConvert.SerializeObject({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% endfor %}), status, cancellationToken).ConfigureAwait(false);
 {%         elsif operation.IsPut -%}
-           var response_ = await PutResourceToEndpoint(request_, JsonConvert.SerializeObject({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% endfor %}), status, cancellationToken).ConfigureAwait(false);
+           response_ = await PutResourceToEndpoint(request_, JsonConvert.SerializeObject({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% endfor %}), status, cancellationToken).ConfigureAwait(false);
 {%     endif -%}
 
-               var disposeResponse_ = true;
             var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
                     if (response_.Content != null && response_.Content.Headers != null)
                     {

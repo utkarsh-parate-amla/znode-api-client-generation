@@ -137,21 +137,11 @@
             throw new System.ArgumentNullException("{{ operation.ContentParameter.VariableName }}");
 
 {%     endif -%}
-        var urlBuilder_ = new System.Text.StringBuilder();
-        urlBuilder_.Append({% if UseBaseUrl %}BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/{% else %}"{% endif %}{{ operation.Path }}{% if operation.HasQueryParameters %}?{% endif %}");
-{%     for parameter in operation.PathParameters -%}
-{%         if parameter.IsOptional -%}
-        if ({{ parameter.VariableName }} != null)
-            {% template Client.Class.PathParameter %}
-        else
-            urlBuilder_.Replace("/{{ "{" }}{{ parameter.Name }}}", string.Empty);
-{%         else -%}
-        {% template Client.Class.PathParameter %}
-{%         endif -%}
-{%     endfor -%}
+        string endpoint = ZnodeAdminSettings.ZnodeApiRootUri;
+        endpoint += "/" + "{{ operation.Path }}"
 {%     if operation.HasQueryParameters -%}
 {%     if operation.IsGetOrDeleteOrHead == true -%}
-       urlBuilder_.Append(BuildEndpointQueryString({% for parameter in operation.QueryParameters %} {{parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %}));
+       endpoint += BuildEndpointQueryString({% for parameter in operation.QueryParameters %} {{parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %});
     {%         endif -%}
     {%     endif -%}
      HttpResponseMessage  response_ = null;
@@ -162,13 +152,13 @@
            ApiStatus status = new ApiStatus();
 
 {%         if operation.IsGet -%}
-           response_ = await GetResourceFromEndpointAsync(urlBuilder_, status, cancellationToken).ConfigureAwait(false);
+           response_ = await GetResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
 {%         elsif operation.IsDelete -%}
-            response_ = await DeleteResourceFromEndpoint(request_, status, cancellationToken).ConfigureAwait(false);
+            response_ = await DeleteResourceFromEndpointAsync(request_, status, cancellationToken).ConfigureAwait(false);
 {%         elsif operation.IsPost -%}
-           response_ = await PostResourceToEndpoint(urlBuilder_, JsonConvert.SerializeObject({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% endfor %}), status, cancellationToken).ConfigureAwait(false);
+           response_ = await PostResourceToEndpointAsync(endpoint, JsonConvert.SerializeObject({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% endfor %}), status, cancellationToken).ConfigureAwait(false);
 {%         elsif operation.IsPut -%}
-           response_ = await PutResourceToEndpoint(request_, JsonConvert.SerializeObject({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% endfor %}), status, cancellationToken).ConfigureAwait(false);
+           response_ = await PutResourceToEndpointAsync(request_, JsonConvert.SerializeObject({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% endfor %}), status, cancellationToken).ConfigureAwait(false);
 {%     endif -%}
 
             var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);

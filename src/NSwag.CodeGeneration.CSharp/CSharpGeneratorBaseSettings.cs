@@ -38,7 +38,7 @@ namespace NSwag.CodeGeneration.CSharp
             ParameterArrayType = "System.Collections.Generic.IEnumerable";
             ParameterDictionaryType = "System.Collections.Generic.IDictionary";
 
-            AdditionalNamespaceUsages = new string[0];
+            AdditionalNamespaceUsages = new string[] { "Znode.Engine.Api.Client", "Znode.Libraries.Abstract.Client", "Znode.Libraries.ECommerce.Utilities", "Znode.Libraries.Abstract.Helper", "Znode.Engine.Api.Models.Responses", "Znode.Engine.Api.Models", "Newtonsoft.Json" };
             AdditionalContractNamespaceUsages = new string[0];
         }
 

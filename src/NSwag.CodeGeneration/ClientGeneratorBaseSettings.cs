@@ -19,7 +19,7 @@ namespace NSwag.CodeGeneration
         protected ClientGeneratorBaseSettings()
         {
             GenerateClientClasses = true;
-            GenerateDtoTypes = true;
+            GenerateDtoTypes = false;
             GenerateClientInterfaces = true;
 
 			OperationNameGenerator = new MultipleClientsFromFirstTagAndPathSegmentsOperationNameGenerator();

@@ -154,11 +154,11 @@
 {%         if operation.IsGet -%}
            response_ = await GetResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
 {%         elsif operation.IsDelete -%}
-            response_ = await DeleteResourceFromEndpointAsync(request_, status, cancellationToken).ConfigureAwait(false);
+            response_ = await DeleteResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
 {%         elsif operation.IsPost -%}
            response_ = await PostResourceToEndpointAsync(endpoint, JsonConvert.SerializeObject({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% endfor %}), status, cancellationToken).ConfigureAwait(false);
 {%         elsif operation.IsPut -%}
-           response_ = await PutResourceToEndpointAsync(request_, JsonConvert.SerializeObject({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% endfor %}), status, cancellationToken).ConfigureAwait(false);
+           response_ = await PutResourceToEndpointAsync(endpoint, JsonConvert.SerializeObject({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% endfor %}), status, cancellationToken).ConfigureAwait(false);
 {%     endif -%}
 
             var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);

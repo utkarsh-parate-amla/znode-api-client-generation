@@ -16,7 +16,7 @@ namespace NSwag.CodeGeneration.CSharp
         {
             ClassName = "{controller}Client";
 
-            GenerateExceptionClasses = true;
+            GenerateExceptionClasses = false;
             ExceptionClass = "ZnodeException";
             ClientClassAccessModifier = "public";
             UseBaseUrl = false;

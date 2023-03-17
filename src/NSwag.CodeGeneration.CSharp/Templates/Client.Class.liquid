@@ -138,7 +138,17 @@
 
 {%     endif -%}
         string endpoint = ZnodeAdminSettings.ZnodeApiRootUri;
-        endpoint += "/" + "{{ operation.Path }}";        
+        endpoint += "/" + "{{ operation.Path }}";
+        {%     for parameter in operation.PathParameters -%}
+{%         if parameter.IsOptional -%}
+        if ({{ parameter.VariableName }} != null)
+            {% template Client.Class.PathParameter %}
+        else
+            endpoint.Replace("/{{ "{" }}{{ parameter.Name }}}", string.Empty);
+{%         else -%}
+        {% template Client.Class.PathParameter %}
+{%         endif -%}
+{%     endfor -%}
 {%     if operation.HasQueryParameters -%}
 {%     if operation.IsGetOrDeleteOrHead == true -%}
        endpoint += BuildEndpointQueryString({% for parameter in operation.QueryParameters %} {{parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %});

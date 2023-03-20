@@ -1,13 +1,13 @@
 {% if parameter.IsDateTimeArray -%}
-endpoint.Replace("{{ "{" }}{{ parameter.Name }}}", System.Uri.EscapeDataString(string.Join(",", System.Linq.Enumerable.Select({{ parameter.VariableName }}, s_ => s_.ToString("{{ ParameterDateTimeFormat }}", System.Globalization.CultureInfo.InvariantCulture)))));
+endpoint = endpoint.Replace("{{ "{" }}{{ parameter.Name }}}", System.Uri.EscapeDataString(string.Join(",", System.Linq.Enumerable.Select({{ parameter.VariableName }}, s_ => s_.ToString("{{ ParameterDateTimeFormat }}", System.Globalization.CultureInfo.InvariantCulture)))));
 {% elsif parameter.IsDateArray -%}
-endpoint.Replace("{{ "{" }}{{ parameter.Name }}}", System.Uri.EscapeDataString(string.Join(",", System.Linq.Enumerable.Select({{ parameter.VariableName }}, s_ => s_.ToString("{{ ParameterDateFormat }}", System.Globalization.CultureInfo.InvariantCulture)))));
+endpoint =endpoint.Replace("{{ "{" }}{{ parameter.Name }}}", System.Uri.EscapeDataString(string.Join(",", System.Linq.Enumerable.Select({{ parameter.VariableName }}, s_ => s_.ToString("{{ ParameterDateFormat }}", System.Globalization.CultureInfo.InvariantCulture)))));
 {% elsif parameter.IsDateTime -%}
-endpoint.Replace("{{ "{" }}{{ parameter.Name }}}", System.Uri.EscapeDataString({{ parameter.VariableName }}.ToString("{{ ParameterDateTimeFormat }}", System.Globalization.CultureInfo.InvariantCulture)));
+endpoint =endpoint.Replace("{{ "{" }}{{ parameter.Name }}}", System.Uri.EscapeDataString({{ parameter.VariableName }}.ToString("{{ ParameterDateTimeFormat }}", System.Globalization.CultureInfo.InvariantCulture)));
 {% elsif parameter.IsDate -%}
-endpoint.Replace("{{ "{" }}{{ parameter.Name }}}", System.Uri.EscapeDataString({{ parameter.VariableName }}.ToString("{{ ParameterDateFormat }}", System.Globalization.CultureInfo.InvariantCulture)));
+endpoint =endpoint.Replace("{{ "{" }}{{ parameter.Name }}}", System.Uri.EscapeDataString({{ parameter.VariableName }}.ToString("{{ ParameterDateFormat }}", System.Globalization.CultureInfo.InvariantCulture)));
 {% elsif parameter.IsArray -%}
-endpoint.Replace("{{ "{" }}{{ parameter.Name }}}", System.Uri.EscapeDataString(string.Join(",", System.Linq.Enumerable.Select({{ parameter.VariableName }}, s_ => ConvertToString(s_, System.Globalization.CultureInfo.InvariantCulture)))));
+endpoint =endpoint.Replace("{{ "{" }}{{ parameter.Name }}}", System.Uri.EscapeDataString(string.Join(",", System.Linq.Enumerable.Select({{ parameter.VariableName }}, s_ => ConvertToString(s_, System.Globalization.CultureInfo.InvariantCulture)))));
 {% else -%}
-endpoint.Replace("{{ "{" }}{{ parameter.Name }}}", System.Uri.EscapeDataString(ConvertToString({{ parameter.VariableName }}, System.Globalization.CultureInfo.InvariantCulture)));
+endpoint =endpoint.Replace("{{ "{" }}{{ parameter.Name }}}", System.Uri.EscapeDataString(ConvertToString({{ parameter.VariableName }}, System.Globalization.CultureInfo.InvariantCulture)));
 {%- endif %}

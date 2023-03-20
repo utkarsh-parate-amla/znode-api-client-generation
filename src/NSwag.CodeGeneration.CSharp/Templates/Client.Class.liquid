@@ -144,7 +144,7 @@
         if ({{ parameter.VariableName }} != null)
             {% template Client.Class.PathParameter %}
         else
-            endpoint.Replace("/{{ "{" }}{{ parameter.Name }}}", string.Empty);
+           endpoint = endpoint.Replace("/{{ "{" }}{{ parameter.Name }}}", string.Empty);
 {%         else -%}
         {% template Client.Class.PathParameter %}
 {%         endif -%}

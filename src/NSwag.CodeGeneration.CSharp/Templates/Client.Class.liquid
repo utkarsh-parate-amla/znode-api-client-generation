@@ -179,10 +179,17 @@
                     }
                     var status_ = (int)response_.StatusCode;
 {%     for response in operation.Responses -%}
-                    if (status_ == {{ response.StatusCode }}{% if response.CheckChunkedStatusCode %} || status_ == 206{% endif %})
+{%     if response.StatusCode ==  '204' -%}
+                     if (status_ == 204)
+                    {
+                    return new {{ operation.SyncResultType }}();
+                    }
+ {%     else -%}
+                     if (status_ == {{ response.StatusCode }}{% if response.CheckChunkedStatusCode %} || status_ == 206{% endif %})
                     {
                         {% template Client.Class.ProcessResponse %}
                     }
+  {%     endif -%}
                     else
 {%     endfor -%}
 {%     if operation.HasDefaultResponse -%}
@@ -194,8 +201,8 @@
 {%         elsif operation.HasSuccessResponse -%}
                     {
                         var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                        throw new {{ ExceptionClass }}("{{ operation.DefaultResponse.ExceptionDescription }}", status_, responseData_, headers_, null);
-                    }
+                        throw new {{ ExceptionClass }}("{{ operation.DefaultResponse.ExceptionDescription }}", status_, responseData_, headers_, null); 
+                   }
 {%        elsif operation.HasResultType -%}
 {%             if operation.WrapResponse and operation.UnwrappedResultType != "FileResponse" %}
                     return new {{ ResponseClass }}<{{ operation.UnwrappedResultType }}>(status_, headers_, {{ operation.UnwrappedResultDefaultValue }});

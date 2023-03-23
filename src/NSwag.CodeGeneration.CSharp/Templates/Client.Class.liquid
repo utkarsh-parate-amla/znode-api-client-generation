@@ -238,7 +238,7 @@
                     {
                         string responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
                         {{ operation.SyncResultType }} typedBody = Newtonsoft.Json.JsonConvert.DeserializeObject<{{ operation.SyncResultType }}>(responseData_, JsonSerializerSettings);
-                        UpdateApiStatus<{{ operation.SyncResultType }}>(typedBody, status, response_);
+                        UpdateApiStatus(typedBody, status, response_);
                         throw new {{ ExceptionClass }}(status.ErrorCode, status.ErrorMessage, status.StatusCode);
                     }
 {%     endif -%}

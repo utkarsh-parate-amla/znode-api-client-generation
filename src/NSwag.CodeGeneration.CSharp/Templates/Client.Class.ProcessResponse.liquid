@@ -26,7 +26,7 @@ var objectResponse_ = await ReadObjectResponseAsync<{{ response.Type }}>(respons
 {%         if response.IsNullable == false -%}
 if (objectResponse_.Object == null)
 {
-     throw new {{ ExceptionClass }}(objectResponse_.Object.ErrorCode, objectResponse_.Object.ErrorMessage, objectResponse_.Object.StatusCode);
+     throw new {{ ExceptionClass }}(objectResponse_.Object.ErrorCode, objectResponse_.Object.ErrorMessage);
 }
 {%         endif -%}
 {%         if response.IsSuccess -%}

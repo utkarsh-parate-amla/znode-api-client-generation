@@ -8,20 +8,12 @@
 {%- endif %}
 
 {% if ExportTypes %}export {% endif %}class {{ Class }} {% if HasBaseClass %}extends {{ BaseClass }} {% endif %}{% if GenerateClientInterfaces %}implements I{{ Class }} {% endif %}{
-    private instance: AxiosInstance;
-    private baseUrl: string;
     protected jsonParseReviver: {% if SupportsStrictNullChecks %}((key: string, value: any) => any) | undefined{% else %}(key: string, value: any) => any{% endif %} = undefined;
 
 {%- if HasExtendedConstructor == false %}
-    constructor({% if HasConfigurationClass %}configuration: {{ ConfigurationClass }}, {% endif %}baseUrl?: string, instance?: AxiosInstance) {
+    constructor({% if HasConfigurationClass %}configuration: {{ ConfigurationClass }}, {% endif %}) {
 {%-     if HasBaseClass %}
         super({% if HasConfigurationClass %}configuration{% endif %});
-{%-     endif %}
-        this.instance = instance ? instance : axios.create();
-{%-     if UseGetBaseUrlMethod %}
-        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : this.getBaseUrl("{{ BaseUrl }}");
-{%-     else %}
-        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "{{ BaseUrl }}";
 {%-     endif %}
     }
 {%- endif %}
@@ -64,10 +56,10 @@
 
 {%     if UseTransformOptionsMethod -%}
         return this.transformOptions(options_).then(transformedOptions_ => {
-            return this.instance.request(transformedOptions_);
+            return axios.create().request(transformedOptions_);
         }).catch((_error: any) => {
 {%     else -%}
-        return this.instance.request(options_).catch((_error: any) => {
+        return axios.create().request(options_).catch((_error: any) => {
 {%     endif -%}
             if (isAxiosError(_error) && _error.response) {
                 return _error.response;

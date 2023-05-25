@@ -1,8 +1,8 @@
 {% if Framework.IsFetchOrAurelia -%}
 {%     if operation.WrapResponse -%}
-return Promise.resolve<{{ operation.ResultType }}>(new {{ operation.ResponseClass }}(status, _headers, null as any));
+return Promise.resolve<any>(new {{ operation.ResponseClass }}(status, _headers, null as any));
 {%     else -%}
-return Promise.resolve<{{ operation.ResultType }}>(null as any);
+return Promise.resolve<any>(null as any);
 {%     endif -%}
 {% elsif Framework.IsAxios -%}
 {%     if operation.WrapResponse -%}

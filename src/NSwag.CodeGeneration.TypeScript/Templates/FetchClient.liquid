@@ -53,7 +53,8 @@
 {%-    if operation.HasResultType and operation.HasAcceptHeaderParameterParameter == false -%}
                 "Accept": "{{ operation.Produces }}"
 {%-    endif -%}
-            }
+            },
+            next: { revalidate: 60 }
         };
 
 {%-    if UseTransformOptionsMethod -%}

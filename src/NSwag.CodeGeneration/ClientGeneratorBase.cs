@@ -175,7 +175,7 @@ namespace NSwag.CodeGeneration
                     operationModel.Path = path;
                     operationModel.HttpMethod = httpMethod;
                     operationModel.OperationName = operationName;
-                    if(operation.Tags.Any(x=> x == "WebstoreAmla"))
+                    if(operation.Tags.Any(x=> x == "Webstore"))
                         result.Add(operationModel);
                 }
             }

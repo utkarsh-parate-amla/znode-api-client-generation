@@ -28,10 +28,17 @@ function throwException(message: string, status: number, response: string, heade
 {%     if WrapDtoExceptions -%}
     throw new {{ ExceptionClassName }}(message, status, response, headers, result);
 {%-     else -%}
+try{
     if (result !== null && result !== undefined)
         throw result;
+   
     else
         throw new Error(message);
+   }
+   catch(ex)
+   {
+    console.log(message);
+   }
 {%     endif -%}
 }
 

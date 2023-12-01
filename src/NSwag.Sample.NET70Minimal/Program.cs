@@ -20,13 +20,17 @@ var app = builder.Build();
 app.UseDeveloperExceptionPage();
 
 app.UseOpenApi();
-app.UseSwaggerUi3();
+app.UseSwaggerUi();
 
 app.MapGet("/", (Func<string>)(() => "Hello World!"))
     .WithTags("General");
 
 app.MapGet("/sum/{a}/{b}", (Func<int, int, int>)((a, b) => a + b))
     .WithName("CalculateSum")
+    .WithTags("Calculator");
+
+app.MapGet("/abs({a})", (Func<int, int>)(a => Math.Abs(a)))
+    .WithName("AbsoluteValue")
     .WithTags("Calculator");
 
 // Optional: Use controllers

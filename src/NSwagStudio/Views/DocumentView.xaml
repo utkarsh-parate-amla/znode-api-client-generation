@@ -48,7 +48,12 @@
                                TextWrapping="Wrap" Margin="0,0,0,12" />
 
                     <TextBlock Margin="0,0,0,4" Text="Default Variables ('foo=bar,baz=bar'), usage: $(foo)" TextWrapping="Wrap" FontWeight="Bold" />
+
                     <TextBox Margin="0,0,0,12" Text="{Binding Document.Document.DefaultVariables}" />
+                    <TextBlock Margin="0,0,0,4" Text="Tag Name" TextWrapping="Wrap" FontWeight="Bold" />
+                    <TextBox Margin="0,0,0,12" Text="{Binding Document.Document.TagName}" />
+
+
                 </StackPanel>
                 <TabControl Grid.Row="2" x:Name="InputTabControl"
                             ItemsSource="{Binding Document.SwaggerGeneratorViews}" 

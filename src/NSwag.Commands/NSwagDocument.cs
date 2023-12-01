@@ -79,6 +79,7 @@ namespace NSwag.Commands
         public override async Task<OpenApiDocumentExecutionResult> ExecuteAsync()
         {
             var document = await GenerateSwaggerDocumentAsync();
+            document.TagName = TagName;
             var tasks = new List<Task>();
             foreach (var codeGenerator in CodeGenerators.Items)
             {

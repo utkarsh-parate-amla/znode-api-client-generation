@@ -62,6 +62,9 @@ namespace NSwag.Commands
         /// <summary>Gets or sets the default variables.</summary>
         public string DefaultVariables { get; set; }
 
+        /// <summary>Gets or sets the tag name.</summary>
+        public string TagName { get; set; }
+
         /// <summary>Gets or sets the selected swagger generator JSON.</summary>
         [JsonProperty("DocumentGenerator")]
         internal JObject SelectedSwaggerGeneratorRaw
@@ -201,6 +204,7 @@ namespace NSwag.Commands
                     }
                 }
             }
+
 
             return LoadDocument<TDocument>(filePath, mappings, data);
         }

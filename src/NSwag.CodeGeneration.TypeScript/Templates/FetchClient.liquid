@@ -35,6 +35,8 @@
         {% template Client.RequestBody %}
 
 {%-    endif -%}
+{%     if operation.IsGet != true -%}
+
         let options_: RequestInit = {
 {%-    if operation.HasBody -%}
             body: content_,
@@ -46,7 +48,7 @@
             headers: await super.getHeaders("{{ operation.HttpMethodUpper | upcase }}"),
             next: { revalidate: 60 }
         };
-        
+  {%-    endif -%}      
 
 {%-    if UseTransformOptionsMethod -%}
         return this.transformOptions(options_).then(transformedOptions_ => {

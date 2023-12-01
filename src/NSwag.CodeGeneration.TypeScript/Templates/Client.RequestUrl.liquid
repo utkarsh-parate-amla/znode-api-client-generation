@@ -1,4 +1,33 @@
-﻿let url_ = baseUrl + "{{ operation.Path }}{% if operation.HasQueryParameters %}{% endif %}";
+﻿{%- assign filterFound = false -%}
+
+{%- for parameter in operation.QueryParameters -%}
+  {%- if parameter.VariableName contains "filter" -%}
+    {%- assign filterFound = true -%}
+    {%- break -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{%- if operation.IsGet == true -%}
+let options_: RequestInit = {
+  {%- if operation.HasBody -%}
+  body: content_,
+  {%- endif -%}
+  method: "{{ operation.HttpMethodUpper | upcase }}",
+  {%- if UseAbortSignal -%}
+  signal,
+  {%- endif -%}
+  headers: await super.getHeaders("{{ operation.HttpMethodUpper | upcase }}"),
+  {%- if filterFound  -%}
+  {%- else -%}
+  next: { revalidate: 60 }
+  {%- endif -%}
+};
+{%- if filterFound -%}
+this.addCacheOption(filter ?? [], options_);
+{%- endif -%}
+{%- endif -%}
+
+let url_ = baseUrl + "{{ operation.Path }}{% if operation.HasQueryParameters %}{% endif %}";
 {%     if operation.HasQueryParameters -%}
 {%     if operation.IsGetOrDeleteOrHeadOrPost == true -%}
        url_ += super.BuildEndpointQueryString({% for parameter in operation.QueryParameters %} {{parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %});

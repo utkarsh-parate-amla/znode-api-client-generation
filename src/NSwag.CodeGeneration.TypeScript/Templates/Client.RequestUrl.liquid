@@ -23,7 +23,7 @@ let options_: RequestInit = {
   {%- endif -%}
 };
 {%- if filterFound -%}
-this.addCacheOption(filter ?? [], options_);
+options_ = this.addCacheOption(filter ?? [], options_);
 {%- endif -%}
 {%- endif -%}
 

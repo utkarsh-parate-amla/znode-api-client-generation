@@ -29,7 +29,7 @@ options_ = this.addCacheOption(filter ?? [], options_);
 
 let url_ = baseUrl + "{{ operation.Path }}{% if operation.HasQueryParameters %}{% endif %}";
 {%     if operation.HasQueryParameters -%}
-{%     if operation.IsGetOrDeleteOrHeadOrPost == true -%}
+{%     if operation.IsGetOrDeleteOrHead == true or  operation.IsPost == true-%}
        url_ += super.BuildEndpointQueryString({% for parameter in operation.QueryParameters %} {{parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %});
     {%         endif -%}
     {%     endif -%}

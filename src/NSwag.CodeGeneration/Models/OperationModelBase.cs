@@ -85,11 +85,10 @@ namespace NSwag.CodeGeneration.Models
         public string HttpMethodLower => ConversionUtilities.ConvertToLowerCamelCase(HttpMethod.ToString(), false);
 
         /// <summary>Gets a value indicating whether the HTTP method is GET or DELETE or HEAD.</summary>
-        public bool IsGetOrDeleteOrHeadOrPost =>
+        public bool IsGetOrDeleteOrHead =>
             HttpMethod == OpenApiOperationMethod.Get ||
             HttpMethod == OpenApiOperationMethod.Delete ||
-            HttpMethod == OpenApiOperationMethod.Head ||
-            HttpMethod == OpenApiOperationMethod.Post;
+            HttpMethod == OpenApiOperationMethod.Head;
 
 		/// <summary>Gets a value indicating whether the HTTP method is GET or DELETE or HEAD.</summary>
 		public bool IsPost =>

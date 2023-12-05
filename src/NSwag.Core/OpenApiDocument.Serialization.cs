@@ -211,5 +211,13 @@ namespace NSwag
         /// <summary>Gets or sets the security definitions (Swagger only).</summary>
         [JsonProperty(PropertyName = "securityDefinitions", Order = 16, DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IDictionary<string, OpenApiSecurityScheme> SecurityDefinitions => Components.SecuritySchemes;
+
+        /// <summary>Gets or sets the base path on which the API is served, which is relative to the <see cref="Host"/>.</summary>
+        [JsonProperty(PropertyName = "TagName", Order = 17, DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        public string TagName
+        {
+            get;
+            set;
+        }
     }
 }

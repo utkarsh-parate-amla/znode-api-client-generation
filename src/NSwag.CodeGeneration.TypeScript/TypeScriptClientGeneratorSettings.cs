@@ -21,19 +21,20 @@ namespace NSwag.CodeGeneration.TypeScript
         public TypeScriptClientGeneratorSettings()
         {
             ClassName = "{controller}Client";
-            ExceptionClass = "ApiException";
+            ExceptionClass = "";
             Template = TypeScriptTemplate.Fetch;
             PromiseType = PromiseType.Promise;
             BaseUrlTokenName = "API_BASE_URL";
             ImportRequiredTypes = true;
             QueryNullValue = "";
-
+            
             TypeScriptGeneratorSettings = new TypeScriptGeneratorSettings
             {
                 SchemaType = SchemaType.Swagger2,
                 MarkOptionalProperties = true,
                 TypeNameGenerator = new TypeScriptTypeNameGenerator(),
-                TypeScriptVersion = 2.7m
+                TypeScriptVersion = 4.3m,
+                TypeStyle = TypeScriptTypeStyle.Interface
             };
 
             TypeScriptGeneratorSettings.TemplateFactory = new DefaultTemplateFactory(TypeScriptGeneratorSettings, new Assembly[]
@@ -41,7 +42,7 @@ namespace NSwag.CodeGeneration.TypeScript
                 typeof(TypeScriptGeneratorSettings).GetTypeInfo().Assembly,
                 typeof(TypeScriptClientGeneratorSettings).GetTypeInfo().Assembly,
             });
-
+            ClientBaseClass = "BaseClient";
             ProtectedMethods = new string[0];
         }
 

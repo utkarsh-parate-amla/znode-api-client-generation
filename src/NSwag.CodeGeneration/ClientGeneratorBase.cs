@@ -175,8 +175,17 @@ namespace NSwag.CodeGeneration
                     operationModel.Path = path;
                     operationModel.HttpMethod = httpMethod;
                     operationModel.OperationName = operationName;
+                    List<string> tagList = document?.TagName?.Split(',')?.ToList();
 
-                    result.Add(operationModel);
+                    if (string.IsNullOrEmpty(document?.TagName))
+                    {
+                        result.Add(operationModel);
+                    }
+                    else
+                    {
+                        if (operation.Tags.Any(element => tagList.Any(item => item.Contains(element))))
+                            result.Add(operationModel);
+                    }
                 }
             }
             return result;

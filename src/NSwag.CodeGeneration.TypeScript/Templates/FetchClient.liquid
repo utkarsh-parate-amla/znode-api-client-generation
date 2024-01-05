@@ -45,8 +45,14 @@
 {%-    if UseAbortSignal -%}
             signal,
 {%-    endif -%}
+{%-    if operation.IsPut == true -%}
             headers: await super.getHeaders("{{ operation.HttpMethodUpper | upcase }}"),
             next: { revalidate: 60 }
+{%- endif -%}
+{%-    if operation.IsPut != true -%}
+            cache: "no-store",
+            headers: await super.getHeaders("{{ operation.HttpMethodUpper | upcase }}"),
+{%- endif -%}
         };
   {%-    endif -%}      
 

@@ -16,7 +16,7 @@ let options_: RequestInit = {
   {%- if UseAbortSignal -%}
   signal,
   {%- endif -%}
-  headers: await super.getHeaders("{{ operation.HttpMethodUpper | upcase }}"),
+  headers: await super.getHeaders("{{ operation.HttpMethodUpper | upcase }}", String(baseUrl)),
   {%- if filterFound  -%}
   {%- else -%}
   next: { revalidate: 60 }

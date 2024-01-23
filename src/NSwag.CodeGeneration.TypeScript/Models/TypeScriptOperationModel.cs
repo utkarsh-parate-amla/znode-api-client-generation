@@ -116,6 +116,9 @@ namespace NSwag.CodeGeneration.TypeScript.Models
         public bool IsFetchOrAurelia => _settings.Template == TypeScriptTemplate.Fetch ||
                                         _settings.Template == TypeScriptTemplate.Aurelia;
 
+        /// <summary>Gets a value indicating Cache Enable/Disable</summary>
+        public bool IsCacheEnabled => _operation?.Tags?.Count > 0 ? _operation.Tags.Any(tag => tag.Equals("CacheEnabledAttribute")) : false;
+
         /// <summary>Gets a value indicating whether to use HttpClient with the Angular template.</summary>
         public bool UseAngularHttpClient => IsAngular && _settings.HttpClass == HttpClass.HttpClient;
 

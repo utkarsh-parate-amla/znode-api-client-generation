@@ -19,7 +19,9 @@ let options_: RequestInit = {
   headers: await super.getHeaders("{{ operation.HttpMethodUpper | upcase }}", String(baseUrl)),
   {%- if filterFound  -%}
   {%- else -%}
+  {%- if operation.IsCacheEnabled == true -%}
   next: { revalidate: 60 }
+  {%- endif -%}
   {%- endif -%}
 };
 {%- if filterFound -%}

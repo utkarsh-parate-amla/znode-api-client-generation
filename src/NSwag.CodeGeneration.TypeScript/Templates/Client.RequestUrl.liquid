@@ -21,6 +21,8 @@ let options_: RequestInit = {
   {%- else -%}
   {%- if operation.IsCacheEnabled == true -%}
   next: { revalidate: 60 }
+  {%- else -%}
+  next: { revalidate: 0 }
   {%- endif -%}
   {%- endif -%}
 };

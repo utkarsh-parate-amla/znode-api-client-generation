@@ -49,6 +49,8 @@
             headers: await super.getHeaders("{{ operation.HttpMethodUpper | upcase }}", String(baseUrl)),
 {%-    if operation.IsCacheEnabled == true -%}
  next: { revalidate: 60 }
+{%- else -%}
+next: { revalidate: 0 }
 {%- endif -%}
 {%- endif -%}
 {%-    if operation.IsPut != true -%}

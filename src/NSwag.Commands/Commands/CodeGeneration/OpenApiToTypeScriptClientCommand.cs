@@ -417,7 +417,6 @@ namespace NSwag.Commands.CodeGeneration
             }
 
             Settings.TypeScriptGeneratorSettings.ExtensionCode = additionalCode;
-
             var document = await GetInputSwaggerDocument().ConfigureAwait(false);
             var clientGenerator = new TypeScriptClientGenerator(document, Settings);
             return clientGenerator.GenerateFile();

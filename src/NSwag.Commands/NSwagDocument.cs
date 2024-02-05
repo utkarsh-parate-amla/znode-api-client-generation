@@ -87,6 +87,7 @@ namespace NSwag.Commands
                 {
                     continue;
                 }
+                document.OutPutFilePathTypeScript = codeGenerator.OutputFilePath;
 
                 tasks.Add(Task.Run(async () =>
                 {

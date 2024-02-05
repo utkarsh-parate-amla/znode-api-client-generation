@@ -16,7 +16,7 @@ let options_: RequestInit = {
   {%- if UseAbortSignal -%}
   signal,
   {%- endif -%}
-  headers: await super.getHeaders("{{ operation.HttpMethodUpper | upcase }}", String(baseUrl)),
+  headers: await getHeaders("{{ operation.HttpMethodUpper | upcase }}", String(baseUrl)),
   {%- if filterFound  -%}
   {%- else -%}
   {%- if operation.IsCacheEnabled == true -%}
@@ -27,14 +27,14 @@ let options_: RequestInit = {
   {%- endif -%}
 };
 {%- if filterFound -%}
-options_ = this.addCacheOption(filter ?? [], options_);
+options_ = addCacheOption(filter ?? [], options_);
 {%- endif -%}
 {%- endif -%}
 
 let url_ = baseUrl + "{{ operation.Path }}{% if operation.HasQueryParameters %}{% endif %}";
 {%     if operation.HasQueryParameters -%}
 {%     if operation.IsGetOrDeleteOrHead == true or  operation.IsPost == true-%}
-       url_ += super.BuildEndpointQueryString({% for parameter in operation.QueryParameters %} {{parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %});
+       url_ += BuildEndpointQueryString({% for parameter in operation.QueryParameters %} {{parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %});
     {%         endif -%}
     {%     endif -%}
 {% for parameter in operation.PathParameters -%}

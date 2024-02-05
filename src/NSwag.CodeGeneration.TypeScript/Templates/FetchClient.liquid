@@ -1,34 +1,8 @@
 ﻿{% if HasOperations -%}
-{% if GenerateClientInterfaces -%}
-{% if ExportTypes %}export {% endif %}interface I{{ Class }} {
-{%    for operation in Operations %}
-
-    {% template Client.Method.Documentation %}
-    {{ operation.MethodAccessModifier }}{{ operation.ActualOperationName }}({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %}?{% endif %}: {{ parameter.Type }}{{ parameter.TypePostfix }}{% if parameter.IsLast == false %}, {% endif %}{% endfor %}): Promise<any>;
-{%-    endfor %}}
-{%- endif -%}
-
-{% if UseAureliaHttpInjection -%}
-@inject({% if HasConfigurationClass %}{{ ConfigurationClass }}, {% endif %}String, HttpClient)
-{%- endif -%}
-{% if ExportTypes %}export {% endif %}class {{ Class }} {% if HasBaseClass %}extends {{ BaseClass }} {% endif %}{% if GenerateClientInterfaces %}implements I{{ Class }} {% endif %}{
-    protected jsonParseReviver: {% if SupportsStrictNullChecks %}((key: string, value: any) => any) | undefined{% else %}(key: string, value: any) => any{% endif %} = undefined;
-{{ '' }}
-{%- if HasExtendedConstructor == false -%}
-    constructor() {
-{%-    if HasBaseClass -%}
-        super({% if HasConfigurationClass %}configuration{% endif %});
-{%-    endif -%}
-    }
-{%- endif -%}
-{%- if HasExtensionCode -%}
-
-    {{ ExtensionCode }}
-{%- endif -%}
 {% for operation in Operations %}
 
     {% template Client.Method.Documentation %}
-   async {{ operation.MethodAccessModifier }}{{ operation.ActualOperationName }}({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %}?{% endif %}: {{ parameter.Type }}{{ parameter.TypePostfix }}{% if parameter.IsLast == false %}, {% endif %}{% endfor %}{% if UseAbortSignal %}{% if operation.Parameters.size > 0 %}, {% endif %}signal?: AbortSignal | undefined{% endif %}): Promise<any> {
+   export async function {{ operation.MethodAccessModifier }}{{ operation.ActualOperationName }}({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %}?{% endif %}: {{ parameter.Type }}{{ parameter.TypePostfix }}{% if parameter.IsLast == false %}, {% endif %}{% endfor %}{% if UseAbortSignal %}{% if operation.Parameters.size > 0 %}, {% endif %}signal?: AbortSignal | undefined{% endif %}): Promise<any> {
         {% template Client.RequestUrl %}
 
 {%-    if operation.HasBody -%}
@@ -70,12 +44,12 @@ next: { revalidate: 0 }
 {%-    if UseTransformResultMethod -%}
             return this.transformResult(url_, _response, (_response: Response) => this.process{{ operation.ActualOperationNameUpper }}(_response));
 {%-    else -%}
-            return this.process{{ operation.ActualOperationNameUpper }}(_response);
+            return process{{ operation.ActualOperationNameUpper }}(_response);
 {%-    endif -%}
         });
     }
 
-    protected process{{ operation.ActualOperationNameUpper }}(response: Response): Promise<any> {
+    function process{{ operation.ActualOperationNameUpper }}(response: Response): Promise<any> {
         const status = response.status;
         {% template Client.ProcessResponse %}
     }

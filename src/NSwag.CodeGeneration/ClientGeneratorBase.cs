@@ -70,23 +70,44 @@ namespace NSwag.CodeGeneration
         /// <returns>The code</returns>
         public string GenerateFile(ClientGeneratorOutputType outputType)
         {
+            bool isInterfaceGeneration = false;
+
+            if (_document.OutPutFilePathTypeScript.TrimEnd('\\').ToLower().Contains("interface"))    isInterfaceGeneration = true;
+                               
             var clientTypes = GenerateAllClientTypes();
 
             var dtoTypes = BaseSettings.GenerateDtoTypes ?
                 GenerateDtoTypes() :
                 Enumerable.Empty<CodeArtifact>();
 
-            clientTypes =
+            bool isTypeScript = dtoTypes.FirstOrDefault(x => x.Language == CodeArtifactLanguage.TypeScript) != null;
+
+            var clientClassTypes =
                 outputType == ClientGeneratorOutputType.Full ? clientTypes :
                 outputType == ClientGeneratorOutputType.Implementation ? clientTypes.Where(t => t.Category != CodeArtifactCategory.Contract) :
                 outputType == ClientGeneratorOutputType.Contracts ? clientTypes.Where(t => t.Category == CodeArtifactCategory.Contract) :
                 Enumerable.Empty<CodeArtifact>();
+            
+                var dtoClassTypes = !isTypeScript ? (
+                    outputType == ClientGeneratorOutputType.Full ||
+                    outputType == ClientGeneratorOutputType.Contracts ? dtoTypes : Enumerable.Empty<CodeArtifact>()) : Enumerable.Empty<CodeArtifact>();
 
-            dtoTypes =
-                outputType == ClientGeneratorOutputType.Full ||
-                outputType == ClientGeneratorOutputType.Contracts ? dtoTypes : Enumerable.Empty<CodeArtifact>();
+            if (isTypeScript && isInterfaceGeneration)
+            {
+                var clientInterfaceType =
+                Enumerable.Empty<CodeArtifact>();
 
-            return GenerateFile(clientTypes, dtoTypes, outputType)
+                var dtoInterfaceType = (
+                    outputType == ClientGeneratorOutputType.Full ||
+                    outputType == ClientGeneratorOutputType.Contracts ? dtoTypes : Enumerable.Empty<CodeArtifact>());
+
+                return GenerateFile(clientInterfaceType, dtoInterfaceType, outputType)
+                .Replace("\r", string.Empty)
+                .Replace("\n\n\n\n", "\n\n")
+                .Replace("\n\n\n", "\n\n");
+            }
+
+            return GenerateFile(clientClassTypes, dtoClassTypes, outputType)
                 .Replace("\r", string.Empty)
                 .Replace("\n\n\n\n", "\n\n")
                 .Replace("\n\n\n", "\n\n");

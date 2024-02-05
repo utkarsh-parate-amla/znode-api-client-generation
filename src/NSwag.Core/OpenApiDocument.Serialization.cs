@@ -219,5 +219,13 @@ namespace NSwag
             get;
             set;
         }
+
+        /// <summary>Gets or sets the base path on which the API is served, which is relative to the <see cref="Host"/>.</summary>
+        [JsonProperty(PropertyName = "OutPutFilePathTypeScript", Order = 18, DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        public string OutPutFilePathTypeScript
+        {
+            get;
+            set;
+        }
     }
 }

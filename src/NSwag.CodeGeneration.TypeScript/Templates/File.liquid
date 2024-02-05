@@ -5,7 +5,9 @@
 //----------------------
 import { CONFIG } from "constants/index";
 const baseUrl = CONFIG.BASE_URL;
-import { addCacheOption,BuildEndpointQueryString,getHeaders } from "@api/BaseClient";
+import { addCacheOption,BuildEndpointQueryString,getHeaders } from "@api/BaseClientFunctions";
+import * as Models from "@api/ZnodeWebstoreFunctionInterface";
+import {FilterTuple} from "@api/ZnodeWebstoreFunctionInterface";
 
 {% template File.Header %}
 

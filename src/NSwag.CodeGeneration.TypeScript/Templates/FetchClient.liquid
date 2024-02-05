@@ -2,7 +2,12 @@
 {% for operation in Operations %}
 
     {% template Client.Method.Documentation %}
-   export async function {{ operation.MethodAccessModifier }}{{ operation.ActualOperationName }}({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %}?{% endif %}: {{ parameter.Type }}{{ parameter.TypePostfix }}{% if parameter.IsLast == false %}, {% endif %}{% endfor %}{% if UseAbortSignal %}{% if operation.Parameters.size > 0 %}, {% endif %}signal?: AbortSignal | undefined{% endif %}): Promise<any> {
+{% if operation.IsPost == true or operation.IsPut == true %}
+   export async function {{ operation.MethodAccessModifier }}{{ Class }}{{ operation.ActualOperationName }}({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %}?{% endif %}: Models.{{ parameter.Type }}{{ parameter.TypePostfix }}{% if parameter.IsLast == false %}, {% endif %}{% endfor %}{% if UseAbortSignal %}{% if operation.Parameters.size > 0 %}, {% endif %}signal?: AbortSignal | undefined{% endif %}): Promise<any> {
+{%- else -%}
+export async function {{ operation.MethodAccessModifier }}{{ Class }}{{ operation.ActualOperationName }}({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %}?{% endif %}: {{ parameter.Type }}{{ parameter.TypePostfix }}{% if parameter.IsLast == false %}, {% endif %}{% endfor %}{% if UseAbortSignal %}{% if operation.Parameters.size > 0 %}, {% endif %}signal?: AbortSignal | undefined{% endif %}): Promise<any> {
+   {%-    endif -%}
+
         {% template Client.RequestUrl %}
 
 {%-    if operation.HasBody -%}
@@ -20,7 +25,7 @@
             signal,
 {%-    endif -%}
 {%-    if operation.IsPut == true -%}
-            headers: await super.getHeaders("{{ operation.HttpMethodUpper | upcase }}", String(baseUrl)),
+            headers: await getHeaders("{{ operation.HttpMethodUpper | upcase }}", String(baseUrl)),
 {%-    if operation.IsCacheEnabled == true -%}
  next: { revalidate: 60 }
 {%- else -%}
@@ -29,7 +34,7 @@ next: { revalidate: 0 }
 {%- endif -%}
 {%-    if operation.IsPut != true -%}
             cache: "no-store",
-            headers: await super.getHeaders("{{ operation.HttpMethodUpper | upcase }}", String(baseUrl)),
+            headers: await getHeaders("{{ operation.HttpMethodUpper | upcase }}", String(baseUrl)),
 {%- endif -%}
         };
   {%-    endif -%}      
@@ -54,5 +59,4 @@ next: { revalidate: 0 }
         {% template Client.ProcessResponse %}
     }
 {% endfor -%}
-}
 {%- endif -%}

@@ -3,9 +3,9 @@
 
     {% template Client.Method.Documentation %}
 {% if operation.IsPost == true or operation.IsPut == true %}
-   export async function {{ operation.MethodAccessModifier }}{{ Class }}{{ operation.ActualOperationName }}({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %}?{% endif %}: Models.{{ parameter.Type }}{{ parameter.TypePostfix }}{% if parameter.IsLast == false %}, {% endif %}{% endfor %}{% if UseAbortSignal %}{% if operation.Parameters.size > 0 %}, {% endif %}signal?: AbortSignal | undefined{% endif %}): Promise<any> {
+   export async function {{ operation.MethodAccessModifier }}{{ Class }}{{ operation.ActualOperationName }}({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %}?{% endif %}:{% if parameter.Type contains 'string' or parameter.Type contains 'number' or parameter.Type contains 'boolean' %}{{ parameter.Type }}{% else %}Models.{{ parameter.Type }}{% endif %}{{ parameter.TypePostfix }}{% if parameter.IsLast == false %}, {% endif %}{% endfor %}{% if UseAbortSignal %}{% if operation.Parameters.size > 0 %}, {% endif %}signal?: AbortSignal | undefined{% endif %}): Promise<any> {
 {%- else -%}
-export async function {{ operation.MethodAccessModifier }}{{ Class }}{{ operation.ActualOperationName }}({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %}?{% endif %}: {{ parameter.Type }}{{ parameter.TypePostfix }}{% if parameter.IsLast == false %}, {% endif %}{% endfor %}{% if UseAbortSignal %}{% if operation.Parameters.size > 0 %}, {% endif %}signal?: AbortSignal | undefined{% endif %}): Promise<any> {
+export async function {{ operation.MethodAccessModifier }}{{ Class }}{{ operation.ActualOperationName }}({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %}?{% endif %}:{% if parameter.Type contains 'ApplicationTypesEnum'%} Models.{{ parameter.Type }}{% else %}{{ parameter.Type }}{% endif %}{{ parameter.TypePostfix }}{% if parameter.IsLast == false %}, {% endif %}{% endfor %}{% if UseAbortSignal %}{% if operation.Parameters.size > 0 %}, {% endif %}signal?: AbortSignal | undefined{% endif %}): Promise<any> {
    {%-    endif -%}
 
         {% template Client.RequestUrl %}
@@ -49,12 +49,12 @@ next: { revalidate: 0 }
 {%-    if UseTransformResultMethod -%}
             return this.transformResult(url_, _response, (_response: Response) => this.process{{ operation.ActualOperationNameUpper }}(_response));
 {%-    else -%}
-            return process{{ operation.ActualOperationNameUpper }}(_response);
+            return process{{ Class }}{{ operation.ActualOperationNameUpper }}(_response);
 {%-    endif -%}
         });
     }
 
-    function process{{ operation.ActualOperationNameUpper }}(response: Response): Promise<any> {
+    function process{{ Class }}{{ operation.ActualOperationNameUpper }}(response: Response): Promise<any> {
         const status = response.status;
         {% template Client.ProcessResponse %}
     }

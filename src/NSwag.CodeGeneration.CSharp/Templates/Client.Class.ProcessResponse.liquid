@@ -25,10 +25,7 @@ return result_;
 var objectResponse_ = await ReadObjectResponseAsync<{{ response.Type }}>(response_, headers_, cancellationToken).ConfigureAwait(false);
 {%     if response.StatusCode !=  '200' -%}
 {%         if response.IsNullable == false -%}
-if (objectResponse_.Object == null)
-{
-     throw new {{ ExceptionClass }}(objectResponse_.Object.ErrorCode, objectResponse_.Object.ErrorMessage);
-}
+
 {%         endif -%}
 {%         endif -%}
 {%         if response.IsSuccess -%}
@@ -50,7 +47,7 @@ responseObject_.Data.Add("HttpResponse", objectResponse_.Text);
 throw responseObject_;
 {%                 endif -%}
 {%             else -%}
-  throw new {{ ExceptionClass }}(objectResponse_.Object.ErrorCode, objectResponse_.Object.ErrorMessage, objectResponse_.Object.StatusCode);
+     throw new {{ ExceptionClass }}(objectResponse_.Object.ErrorCode, objectResponse_.Object.ErrorMessage);
 {%             endif -%}
 {%         endif -%}
 {%     endif -%}

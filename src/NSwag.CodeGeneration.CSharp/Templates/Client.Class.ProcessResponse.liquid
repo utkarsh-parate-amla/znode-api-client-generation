@@ -23,11 +23,13 @@ return result_;
 {%         endif -%}
 {%     else -%}
 var objectResponse_ = await ReadObjectResponseAsync<{{ response.Type }}>(response_, headers_, cancellationToken).ConfigureAwait(false);
+{%     if response.StatusCode !=  '200' -%}
 {%         if response.IsNullable == false -%}
 if (objectResponse_.Object == null)
 {
      throw new {{ ExceptionClass }}(objectResponse_.Object.ErrorCode, objectResponse_.Object.ErrorMessage);
 }
+{%         endif -%}
 {%         endif -%}
 {%         if response.IsSuccess -%}
 {%             if operation.WrapResponse -%}

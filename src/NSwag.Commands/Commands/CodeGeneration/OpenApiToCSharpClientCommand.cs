@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using NConsole;
@@ -249,9 +250,28 @@ namespace NSwag.Commands.CodeGeneration
             foreach (var pair in result)
             {
                 await TryWriteFileOutputAsync(pair.Key, host, () => pair.Value).ConfigureAwait(false);
+                string filePath = pair.Key;
+                string keyword = "Newtonsoft.Json.JsonProperty";
+
+                 RemoveLinesAsync(filePath, keyword);
             }
 
+
+
             return result;
+        }
+
+
+         void RemoveLinesAsync(string filePath, string keyword)
+        {
+            // Read all lines from the file asynchronously
+            string[] lines =  File.ReadAllLines(filePath);
+
+            // Filter out lines containing the keyword
+            var filteredLines = lines.Where(line => !line.Contains(keyword));
+
+            // Write the filtered lines back to the same file asynchronously
+             File.WriteAllLines(filePath, filteredLines);
         }
 
         public async Task<Dictionary<string, string>> RunAsync()

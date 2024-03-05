@@ -72,7 +72,8 @@ namespace NSwag.CodeGeneration
         {
             bool isInterfaceGeneration = false;
 
-            if (_document.OutPutFilePathTypeScript.TrimEnd('\\').ToLower().Contains("interface"))    isInterfaceGeneration = true;
+            if (_document.OutPutFilePathTypeScript.TrimEnd('\\').ToLower().Contains("interface") || _document.OutPutFilePathTypeScript.TrimEnd('\\').ToLower().Contains("model")) 
+                isInterfaceGeneration = true;
                                
             var clientTypes = GenerateAllClientTypes();
 
@@ -80,7 +81,8 @@ namespace NSwag.CodeGeneration
                 GenerateDtoTypes() :
                 Enumerable.Empty<CodeArtifact>();
 
-            bool isTypeScript = dtoTypes.FirstOrDefault(x => x.Language == CodeArtifactLanguage.TypeScript) != null;
+            bool isTypeScript = dtoTypes.FirstOrDefault(x => x.Language == CodeArtifactLanguage.TypeScript) != null ||
+                dtoTypes.FirstOrDefault(x => x.Language == CodeArtifactLanguage.CSharp) != null;
 
             var clientClassTypes =
                 outputType == ClientGeneratorOutputType.Full ? clientTypes :

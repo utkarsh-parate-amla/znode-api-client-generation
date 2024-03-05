@@ -6,8 +6,12 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime;
+using System.Xml.Linq;
+
 using NJsonSchema;
 using NJsonSchema.CodeGeneration;
 using NJsonSchema.CodeGeneration.CSharp;
@@ -102,6 +106,11 @@ namespace NSwag.CodeGeneration.CSharp
         /// <returns>The code artifact collection.</returns>
         protected override IEnumerable<CodeArtifact> GenerateDtoTypes()
         {
+            _settings.CSharpGeneratorSettings.DateTimeType = "System.DateTime";
+            _settings.CSharpGeneratorSettings.DateType = "System.DateTime";
+            _settings.CSharpGeneratorSettings.ExcludedTypeNames = new string[] { "FilterTuple" };
+            _settings.AdditionalNamespaceUsages = _settings.AdditionalNamespaceUsages.Where(ns => !ns.ToLower().Contains("model")).ToArray();
+
             var generator = new CSharpGenerator(_document, _settings.CSharpGeneratorSettings, _resolver);
             return generator.GenerateTypes();
         }

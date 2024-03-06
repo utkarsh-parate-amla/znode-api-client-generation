@@ -166,22 +166,20 @@ namespace NSwag.Commands
         /// <param name="filePath">The file path.</param>
         /// <param name="variables">The variables.</param>
         /// <param name="applyTransformations">Specifies whether to expand environment variables and convert variables.</param>
-        /// <param name="mappings">The mappings.</param>
         /// <returns>The document.</returns>
         protected static async Task<TDocument> LoadAsync<TDocument>(
             string filePath,
             string variables,
-            bool applyTransformations,
-            IDictionary<Type, Type> mappings)
+            bool applyTransformations)
             where TDocument : NSwagDocumentBase, new()
         {
-            var data = DynamicApis.FileReadAllText(filePath);
+            var data = File.ReadAllText(filePath);
             data = TransformLegacyDocument(data, out var requiredLegacyTransformations);
 
             if (requiredLegacyTransformations)
             {
                 // Save now to avoid transformations
-                var document = LoadDocument<TDocument>(filePath, mappings, data);
+                var document = LoadDocument<TDocument>(filePath, data);
                 await document.SaveAsync();
             }
 
@@ -205,16 +203,12 @@ namespace NSwag.Commands
                 }
             }
 
-
-            return LoadDocument<TDocument>(filePath, mappings, data);
+            return LoadDocument<TDocument>(filePath, data);
         }
 
-        private static TDocument LoadDocument<TDocument>(string filePath, IDictionary<Type, Type> mappings, string data)
+        private static TDocument LoadDocument<TDocument>(string filePath, string data)
             where TDocument : NSwagDocumentBase, new()
         {
-            var settings = GetSerializerSettings();
-            settings.ContractResolver = new BaseTypeMappingContractResolver(mappings);
-
             var document = FromJson<TDocument>(filePath, data);
             return document;
         }
@@ -245,7 +239,7 @@ namespace NSwag.Commands
         /// <returns>The task.</returns>
         public Task SaveAsync()
         {
-            DynamicApis.FileWriteAllText(Path, ToJsonWithRelativePaths());
+            File.WriteAllText(Path, ToJsonWithRelativePaths());
             _latestData = JsonConvert.SerializeObject(this, Formatting.Indented, GetSerializerSettings());
             return Task.CompletedTask;
         }
@@ -329,31 +323,8 @@ namespace NSwag.Commands
                 }
             }
 
-            if (SwaggerGenerators.WebApiToOpenApiCommand != null)
-            {
-                SwaggerGenerators.WebApiToOpenApiCommand.AssemblyPaths =
-                    SwaggerGenerators.WebApiToOpenApiCommand.AssemblyPaths.Select(ConvertToAbsolutePath).ToArray();
-                SwaggerGenerators.WebApiToOpenApiCommand.ReferencePaths =
-                    SwaggerGenerators.WebApiToOpenApiCommand.ReferencePaths.Select(ConvertToAbsolutePath).ToArray();
-
-                SwaggerGenerators.WebApiToOpenApiCommand.DocumentTemplate = ConvertToAbsolutePath(
-                    SwaggerGenerators.WebApiToOpenApiCommand.DocumentTemplate);
-                SwaggerGenerators.WebApiToOpenApiCommand.AssemblyConfig = ConvertToAbsolutePath(
-                    SwaggerGenerators.WebApiToOpenApiCommand.AssemblyConfig);
-            }
-
             if (SwaggerGenerators.AspNetCoreToOpenApiCommand != null)
             {
-                SwaggerGenerators.AspNetCoreToOpenApiCommand.AssemblyPaths =
-                    SwaggerGenerators.AspNetCoreToOpenApiCommand.AssemblyPaths.Select(ConvertToAbsolutePath).ToArray();
-                SwaggerGenerators.AspNetCoreToOpenApiCommand.ReferencePaths =
-                    SwaggerGenerators.AspNetCoreToOpenApiCommand.ReferencePaths.Select(ConvertToAbsolutePath).ToArray();
-
-                SwaggerGenerators.AspNetCoreToOpenApiCommand.DocumentTemplate = ConvertToAbsolutePath(
-                    SwaggerGenerators.AspNetCoreToOpenApiCommand.DocumentTemplate);
-                SwaggerGenerators.AspNetCoreToOpenApiCommand.AssemblyConfig = ConvertToAbsolutePath(
-                    SwaggerGenerators.AspNetCoreToOpenApiCommand.AssemblyConfig);
-
                 SwaggerGenerators.AspNetCoreToOpenApiCommand.Project = ConvertToAbsolutePath(
                     SwaggerGenerators.AspNetCoreToOpenApiCommand.Project);
                 SwaggerGenerators.AspNetCoreToOpenApiCommand.MSBuildProjectExtensionsPath = ConvertToAbsolutePath(
@@ -361,14 +332,6 @@ namespace NSwag.Commands
 
                 SwaggerGenerators.AspNetCoreToOpenApiCommand.WorkingDirectory = ConvertToAbsolutePath(
                     SwaggerGenerators.AspNetCoreToOpenApiCommand.WorkingDirectory);
-            }
-
-            if (SwaggerGenerators.TypesToOpenApiCommand != null)
-            {
-                SwaggerGenerators.TypesToOpenApiCommand.AssemblyPaths =
-                    SwaggerGenerators.TypesToOpenApiCommand.AssemblyPaths.Select(ConvertToAbsolutePath).ToArray();
-                SwaggerGenerators.TypesToOpenApiCommand.AssemblyConfig = ConvertToAbsolutePath(
-                    SwaggerGenerators.TypesToOpenApiCommand.AssemblyConfig);
             }
 
             if (CodeGenerators.OpenApiToTypeScriptClientCommand != null)
@@ -424,31 +387,8 @@ namespace NSwag.Commands
                 }
             }
 
-            if (SwaggerGenerators.WebApiToOpenApiCommand != null)
-            {
-                SwaggerGenerators.WebApiToOpenApiCommand.AssemblyPaths =
-                    SwaggerGenerators.WebApiToOpenApiCommand.AssemblyPaths.Select(ConvertToRelativePath).ToArray();
-                SwaggerGenerators.WebApiToOpenApiCommand.ReferencePaths =
-                    SwaggerGenerators.WebApiToOpenApiCommand.ReferencePaths.Select(ConvertToRelativePath).ToArray();
-
-                SwaggerGenerators.WebApiToOpenApiCommand.DocumentTemplate = ConvertToRelativePath(
-                    SwaggerGenerators.WebApiToOpenApiCommand.DocumentTemplate);
-                SwaggerGenerators.WebApiToOpenApiCommand.AssemblyConfig = ConvertToRelativePath(
-                    SwaggerGenerators.WebApiToOpenApiCommand.AssemblyConfig);
-            }
-
             if (SwaggerGenerators.AspNetCoreToOpenApiCommand != null)
             {
-                SwaggerGenerators.AspNetCoreToOpenApiCommand.AssemblyPaths =
-                    SwaggerGenerators.AspNetCoreToOpenApiCommand.AssemblyPaths.Select(ConvertToRelativePath).ToArray();
-                SwaggerGenerators.AspNetCoreToOpenApiCommand.ReferencePaths =
-                    SwaggerGenerators.AspNetCoreToOpenApiCommand.ReferencePaths.Select(ConvertToRelativePath).ToArray();
-
-                SwaggerGenerators.AspNetCoreToOpenApiCommand.DocumentTemplate = ConvertToRelativePath(
-                    SwaggerGenerators.AspNetCoreToOpenApiCommand.DocumentTemplate);
-                SwaggerGenerators.AspNetCoreToOpenApiCommand.AssemblyConfig = ConvertToRelativePath(
-                    SwaggerGenerators.AspNetCoreToOpenApiCommand.AssemblyConfig);
-
                 SwaggerGenerators.AspNetCoreToOpenApiCommand.Project = ConvertToRelativePath(
                     SwaggerGenerators.AspNetCoreToOpenApiCommand.Project);
                 SwaggerGenerators.AspNetCoreToOpenApiCommand.MSBuildProjectExtensionsPath = ConvertToRelativePath(
@@ -456,15 +396,6 @@ namespace NSwag.Commands
 
                 SwaggerGenerators.AspNetCoreToOpenApiCommand.WorkingDirectory = ConvertToRelativePath(
                     SwaggerGenerators.AspNetCoreToOpenApiCommand.WorkingDirectory);
-            }
-
-
-            if (SwaggerGenerators.TypesToOpenApiCommand != null)
-            {
-                SwaggerGenerators.TypesToOpenApiCommand.AssemblyPaths =
-                    SwaggerGenerators.TypesToOpenApiCommand.AssemblyPaths.Select(ConvertToRelativePath).ToArray();
-                SwaggerGenerators.TypesToOpenApiCommand.AssemblyConfig = ConvertToRelativePath(
-                    SwaggerGenerators.TypesToOpenApiCommand.AssemblyConfig);
             }
 
             if (CodeGenerators.OpenApiToTypeScriptClientCommand != null)
@@ -584,12 +515,6 @@ namespace NSwag.Commands
             if (data.Contains("\"aspNetNamespace\": \"Microsoft.AspNetCore.Mvc\""))
             {
                 data = data.Replace("\"aspNetNamespace\": \"Microsoft.AspNetCore.Mvc\"", "\"controllerTarget\": \"AspNetCore\"");
-                saveFile = true;
-            }
-
-            if (data.Contains("\"noBuild\":") && !data.ToLowerInvariant().Contains("UseDocumentProvider".ToLowerInvariant()))
-            {
-                data = data.Replace("\"noBuild\":", "\"useDocumentProvider\": false, \"noBuild\":");
                 saveFile = true;
             }
 

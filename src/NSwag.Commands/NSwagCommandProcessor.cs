@@ -8,6 +8,7 @@
 
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using NConsole;
@@ -54,7 +55,7 @@ namespace NSwag.Commands
             {
                 var processor = new CommandLineProcessor(_host);
 
-                processor.RegisterCommandsFromAssembly(typeof(SwaggerToCSharpControllerCommand).GetTypeInfo().Assembly);
+                processor.RegisterCommandsFromAssembly(typeof(OpenApiToCSharpControllerCommand).GetTypeInfo().Assembly);
 
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
@@ -88,7 +89,7 @@ namespace NSwag.Commands
                     entryAssembly = typeof(NSwagCommandProcessor).GetTypeInfo().Assembly;
                 }
 
-                var binDirectory = DynamicApis.PathGetDirectoryName(new Uri(entryAssembly.CodeBase).LocalPath);
+                var binDirectory = Path.GetDirectoryName(new Uri(entryAssembly.CodeBase).LocalPath);
                 _host.WriteMessage("NSwag bin directory: " + binDirectory + "\n");
             }
             catch (Exception exception)

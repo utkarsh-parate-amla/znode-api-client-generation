@@ -4,9 +4,9 @@ using Nuke.Common.CI.GitHubActions.Configuration;
 using Nuke.Common.Execution;
 using Nuke.Common.Utilities;
 
-[CustomGitHubActionsAttribute(
+[CustomGitHubActions(
     "pr",
-    GitHubActionsImage.WindowsServer2022,
+    GitHubActionsImage.WindowsLatest,
     // GitHubActionsImage.UbuntuLatest,
     // GitHubActionsImage.MacOsLatest,
     OnPullRequestBranches = new[] { "master", "main" },
@@ -14,11 +14,12 @@ using Nuke.Common.Utilities;
     OnPullRequestExcludePaths = new[] { "**/*.md" },
     PublishArtifacts = false,
     InvokedTargets = new[] { nameof(InstallDependencies), nameof(Compile), nameof(Test), nameof(Pack) },
-    CacheKeyFiles = new[] { "global.json", "src/**/*.csproj", "src/**/package.json" }),
+    CacheKeyFiles = new[] { "global.json", "src/**/*.csproj", "src/**/package.json" },
+    JobConcurrencyCancelInProgress = true),
 ]
-[CustomGitHubActionsAttribute(
+[CustomGitHubActions(
     "build",
-    GitHubActionsImage.WindowsServer2022,
+    GitHubActionsImage.WindowsLatest,
     // GitHubActionsImage.UbuntuLatest,
     // GitHubActionsImage.MacOsLatest,
     OnPushBranches = new[] { "master", "main" },
@@ -45,14 +46,14 @@ class CustomGitHubActionsAttribute : GitHubActionsAttribute
         var job = base.GetJobs(image, relevantTargets);
 
         var newSteps = new List<GitHubActionsStep>(job.Steps);
-        foreach (var version in new[] { "7.0.*", "6.0.*", "5.0.*", "3.1.*", "2.1.*" })
+
+        // only need to list the ones that are missing from default image
+        newSteps.Insert(0, new GitHubActionsSetupDotNetStep(new[] 
         {
-            newSteps.Insert(1, new GitHubActionsSetupDotNetStep
-            {
-                Version = version
-            });
-        }
-        
+            "8.0.100"
+        }));
+		
+        newSteps.Insert(0, new GitHubActionsUseGnuTarStep());
         newSteps.Insert(0, new GitHubActionsConfigureLongPathsStep());
 
         job.Steps = newSteps.ToArray();
@@ -74,7 +75,12 @@ class GitHubActionsConfigureLongPathsStep : GitHubActionsStep
 
 class GitHubActionsSetupDotNetStep : GitHubActionsStep
 {
-    public string Version { get; init; }
+    public GitHubActionsSetupDotNetStep(string[] versions)
+    {
+        Versions = versions;
+    }
+
+    string[] Versions { get; }
 
     public override void Write(CustomFileWriter writer)
     {
@@ -85,7 +91,33 @@ class GitHubActionsSetupDotNetStep : GitHubActionsStep
             writer.WriteLine("with:");
             using (writer.Indent())
             {
-                writer.WriteLine($"dotnet-version: {Version}");
+                writer.WriteLine("dotnet-version: |");
+                using (writer.Indent())
+                {
+                    foreach (var version in Versions)
+                    {
+                        writer.WriteLine(version);
+                    }
+                }
+            }
+        }
+    }
+}
+
+class GitHubActionsUseGnuTarStep : GitHubActionsStep
+{
+    public override void Write(CustomFileWriter writer)
+    {
+        writer.WriteLine("- if: ${{ runner.os == 'Windows' }}");
+        using (writer.Indent())
+        {
+            writer.WriteLine("name: 'Use GNU tar'");
+            writer.WriteLine("shell: cmd");
+            writer.WriteLine("run: |");
+            using (writer.Indent())
+            {
+                writer.WriteLine("echo \"Adding GNU tar to PATH\"");
+                writer.WriteLine("echo C:\\Program Files\\Git\\usr\\bin>>\"%GITHUB_PATH%\"");
             }
         }
     }

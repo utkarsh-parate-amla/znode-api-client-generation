@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using NConsole;
 using NJsonSchema.CodeGeneration.TypeScript;
@@ -18,15 +19,9 @@ using NSwag.CodeGeneration.TypeScript;
 namespace NSwag.Commands.CodeGeneration
 {
     [Command(Name = "openapi2tsclient", Description = "Generates TypeScript client code from a Swagger/OpenAPI specification.")]
-    public class OpenApiToTypeScriptClientCommand : SwaggerToTypeScriptClientCommand
+    public class OpenApiToTypeScriptClientCommand : CodeGeneratorCommandBase<TypeScriptClientGeneratorSettings>
     {
-    }
-
-    [Command(Name = "swagger2tsclient", Description = "Generates TypeScript client code from a Swagger/OpenAPI specification (obsolete: use openapi2tsclient instead).")]
-    [Obsolete("Use openapi2tsclient instead.")]
-    public class SwaggerToTypeScriptClientCommand : CodeGeneratorCommandBase<TypeScriptClientGeneratorSettings>
-    {
-        public SwaggerToTypeScriptClientCommand()
+        public OpenApiToTypeScriptClientCommand()
             : base(new TypeScriptClientGeneratorSettings())
         {
         }
@@ -373,7 +368,7 @@ namespace NSwag.Commands.CodeGeneration
             set { Settings.QueryNullValue = value; }
         }
 
-        [Argument(Name = "UseAbortSignal", IsRequired = false, Description = "Specifies whether to use the AbortSignal (Fetch/Aurelia template only, default: false).")]
+        [Argument(Name = "UseAbortSignal", IsRequired = false, Description = "Specifies whether to use the AbortSignal (Aurelia/Axios/Fetch template only, default: false).")]
         public bool UseAbortSignal
         {
             get { return Settings.UseAbortSignal; }
@@ -411,9 +406,9 @@ namespace NSwag.Commands.CodeGeneration
         public async Task<string> RunAsync()
         {
             var additionalCode = ExtensionCode ?? string.Empty;
-            if (DynamicApis.FileExists(additionalCode))
+            if (File.Exists(additionalCode))
             {
-                additionalCode = DynamicApis.FileReadAllText(additionalCode);
+                additionalCode = File.ReadAllText(additionalCode);
             }
 
             Settings.TypeScriptGeneratorSettings.ExtensionCode = additionalCode;

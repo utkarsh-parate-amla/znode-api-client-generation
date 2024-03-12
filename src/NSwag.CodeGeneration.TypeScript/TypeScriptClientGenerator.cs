@@ -114,7 +114,7 @@ namespace NSwag.CodeGeneration.TypeScript
 
         /// <summary>Generates all DTO types.</summary>
         /// <returns>The code artifact collection.</returns>
-        protected override IEnumerable<CodeArtifact> GenerateDtoTypes()
+        protected override IEnumerable<CodeArtifact> GenerateDtoTypes(bool GenerateDtoTypes = false)
         {
             var generator = new TypeScriptGenerator(_document, Settings.TypeScriptGeneratorSettings, _resolver);
             return generator.GenerateTypes(_extensionCode);

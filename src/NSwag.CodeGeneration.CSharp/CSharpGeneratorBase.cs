@@ -104,11 +104,13 @@ namespace NSwag.CodeGeneration.CSharp
 
         /// <summary>Generates all DTO types.</summary>
         /// <returns>The code artifact collection.</returns>
-        protected override IEnumerable<CodeArtifact> GenerateDtoTypes()
+        protected override IEnumerable<CodeArtifact> GenerateDtoTypes(bool isClientGeneration)
         {
             _settings.CSharpGeneratorSettings.DateTimeType = "System.DateTime";
             _settings.CSharpGeneratorSettings.DateType = "System.DateTime";
-            _settings.CSharpGeneratorSettings.ExcludedTypeNames = new string[] { "FilterTuple" };
+            _settings.CSharpGeneratorSettings.ExcludedTypeNames = new string[] { "FilterTuple"};
+            if(isClientGeneration)
+                _settings.CSharpGeneratorSettings.ExcludedTypeNames = new string[] { "FileResponse", "FileParameter" };
             _settings.AdditionalNamespaceUsages = _settings.AdditionalNamespaceUsages.Where(ns => !ns.ToLower().Contains("model")).ToArray();
 
             var generator = new CSharpGenerator(_document, _settings.CSharpGeneratorSettings, _resolver);

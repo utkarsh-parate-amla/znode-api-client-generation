@@ -180,9 +180,13 @@
                     var status_ = (int)response_.StatusCode;
 {%     for response in operation.Responses -%}
 {%     if response.StatusCode ==  '204' -%}
-                     if (status_ == 204)
+                    if (status_ == 204)
                     {
-                    return new {{ operation.SyncResultType }}();
+                      {% if operation.SyncResultType == 'FileResponse' -%}
+                      return null;
+                      {% else -%}
+             return new {{ operation.SyncResultType }}();
+                    {% endif %}
                     }
  {%     else -%}
                      if (status_ == {{ response.StatusCode }}{% if response.CheckChunkedStatusCode %} || status_ == 206{% endif %})

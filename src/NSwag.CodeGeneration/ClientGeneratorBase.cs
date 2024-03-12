@@ -71,14 +71,15 @@ namespace NSwag.CodeGeneration
         public string GenerateFile(ClientGeneratorOutputType outputType)
         {
             bool isInterfaceGeneration = false;
+            bool isClientGeneration = _document.OutPutFilePathTypeScript.Split('\\').Last().ToLower().Contains("client");
 
             if (_document.OutPutFilePathTypeScript.TrimEnd('\\').ToLower().Contains("interface") || _document.OutPutFilePathTypeScript.TrimEnd('\\').ToLower().Contains("model")) 
                 isInterfaceGeneration = true;
-                               
+
             var clientTypes = GenerateAllClientTypes();
 
             var dtoTypes = BaseSettings.GenerateDtoTypes ?
-                GenerateDtoTypes() :
+                GenerateDtoTypes(isClientGeneration) :
                 Enumerable.Empty<CodeArtifact>();
 
             bool isTypeScript = dtoTypes.FirstOrDefault(x => x.Language == CodeArtifactLanguage.TypeScript) != null ||
@@ -160,7 +161,7 @@ namespace NSwag.CodeGeneration
 
         /// <summary>Generates all DTO types.</summary>
         /// <returns>The code artifact collection.</returns>
-        protected abstract IEnumerable<CodeArtifact> GenerateDtoTypes();
+        protected abstract IEnumerable<CodeArtifact> GenerateDtoTypes(bool isClientGeneration = false);
 
         /// <summary>Creates an operation model.</summary>
         /// <param name="operation">The operation.</param>

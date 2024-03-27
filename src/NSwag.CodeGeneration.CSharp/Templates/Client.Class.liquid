@@ -137,7 +137,7 @@
             throw new System.ArgumentNullException("{{ operation.ContentParameter.VariableName }}");
 
 {%     endif -%}
-        string endpoint = ZnodeAdminSettings.ZnodeApiRootUri;
+        string endpoint = ZnodeAdminSettings.ZnodeApiGateway;
         endpoint += "/" + "{{ operation.Path }}";
         {%     for parameter in operation.PathParameters -%}
 {%         if parameter.IsOptional -%}

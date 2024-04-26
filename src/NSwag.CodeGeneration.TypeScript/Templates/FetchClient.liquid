@@ -1,41 +1,61 @@
 ﻿{% if HasOperations -%}
-{% for operation in Operations %}
 
-    {% template Client.Method.Documentation %}
-{% if operation.IsPost == true or operation.IsPut == true %}
-   export async function {{ operation.MethodAccessModifier }}{{ Class | replace: "Client", "" }}_{{ operation.ActualOperationName }}({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %}?{% endif %}:{% if parameter.Type contains 'string' or parameter.Type contains 'number' or parameter.Type contains 'boolean' %}{{ parameter.Type }}{% else %}Models.{{ parameter.Type }}{% endif %}{{ parameter.TypePostfix }}{% if parameter.IsLast == false %}, {% endif %}{% endfor %}{% if UseAbortSignal %}{% if operation.Parameters.size > 0 %}, {% endif %}signal?: AbortSignal | undefined{% endif %}): Promise<any> {
+{% for operation in Operations %}
+{% if Version == 'v2' %}
+  {% assign firstParameter = '' %}
+  {% for parameter in operation.Parameters %}
+    {% assign firstParameter = parameter.VariableName | capitalize %}
+    {% assign firstParameter = 'By' | append: firstParameter %}
+    {% break %}
+  {% endfor %}
+
+{% assign containsTextInCurlyBraces = false %}
+
+{% if operation.Path contains '{' and operation.Path contains '}' %}
+  {% assign textInCurlyBraces = operation.Path | split: '{' | last | split: '}' | first %}
+  {% if textInCurlyBraces != blank %}
+    {% assign containsTextInCurlyBraces = true %}
+  {% endif %}
+{% endif %}
+{% endif %}
+ {% template Client.Method.Documentation %}
+ {% if operation.IsPost == true or operation.IsPut == true %}
+export async function {{ operation.MethodAccessModifier }}{{ Class | replace: "Client", "" }}_{{ operation.ActualOperationName }}({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %}?{% endif %}:{% if parameter.Type contains 'string' or parameter.Type contains 'number' or parameter.Type contains 'boolean' %}{{ parameter.Type }}{% else %}Models.{{ parameter.Type }}{% endif %}{{ parameter.TypePostfix }}{% if parameter.IsLast == false %}, {% endif %}{% endfor %}{% if UseAbortSignal %}{% if operation.Parameters.size > 0 %}, {% endif %}signal?: AbortSignal | undefined{% endif %}): Promise<any> {
 {%- else -%}
-    export async function {{ operation.MethodAccessModifier }}{{ Class | replace: "Client", "" }}_{{ operation.ActualOperationName }}({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %}?{% endif %}:{% if parameter.Type contains 'ApplicationTypesEnum'%} Models.{{ parameter.Type }}{% else %}{{ parameter.Type }}{% endif %}{{ parameter.TypePostfix }}{% if parameter.IsLast == false %}, {% endif %}{% endfor %}{% if UseAbortSignal %}{% if operation.Parameters.size > 0 %}, {% endif %}signal?: AbortSignal | undefined{% endif %}): Promise<any> {
+{% unless containsTextInCurlyBraces %}
+export async function {{ operation.MethodAccessModifier }}{{ Class | replace: "Client", "" }}_{{ operation.ActualOperationName }}({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %}?{% endif %}:{% if parameter.Type contains 'ApplicationTypesEnum'%} Models.{{ parameter.Type }}{% else %}{{ parameter.Type }}{% endif %}{{ parameter.TypePostfix }}{% if parameter.IsLast == false %}, {% endif %}{% endfor %}{% if UseAbortSignal %}{% if operation.Parameters.size > 0 %}, {% endif %}signal?: AbortSignal | undefined{% endif %}): Promise<any> {
+ {% else %}
+export async function {{ operation.MethodAccessModifier }}{{ Class | replace: "Client", "" }}_{{ operation.ActualOperationName }}{{firstParameter}}({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %}?{% endif %}:{% if parameter.Type contains 'ApplicationTypesEnum'%} Models.{{ parameter.Type }}{% else %}{{ parameter.Type }}{% endif %}{{ parameter.TypePostfix }}{% if parameter.IsLast == false %}, {% endif %}{% endfor %}{% if UseAbortSignal %}{% if operation.Parameters.size > 0 %}, {% endif %}signal?: AbortSignal | undefined{% endif %}): Promise<any> {
+    {% endunless %}
    {%-    endif -%}
 
         {% template Client.RequestUrl %}
 
-{%-    if operation.HasBody -%}
-        {% template Client.RequestBody %}
+ {%-    if operation.HasBody -%}
+     {% template Client.RequestBody %}
 
-{%-    endif -%}
-{%     if operation.IsGet != true -%}
-
+ {%-    endif -%}
+ {%     if operation.IsGet != true -%}
         let options_: RequestInit = {
-{%-    if operation.HasBody -%}
+ {%-    if operation.HasBody -%}
             body: content_,
-{%-    endif -%}
+ {%-    endif -%}
             method: "{{ operation.HttpMethodUpper | upcase }}",
-{%-    if UseAbortSignal -%}
-            signal,
-{%-    endif -%}
-{%-    if operation.IsPut == true -%}
+ {%-    if UseAbortSignal -%}
+             signal,
+ {%-    endif -%}
+ {%-    if operation.IsPut == true -%}
             headers: await getHeaders("{{ operation.HttpMethodUpper | upcase }}", String(baseUrl)),
-{%-    if operation.IsCacheEnabled == true -%}
+ {%-    if operation.IsCacheEnabled == true -%}
             next: { revalidate: 60 }
-{%- else -%}
+ {%- else -%}
             next: { revalidate: 0 }
-{%- endif -%}
-{%- endif -%}
-{%-    if operation.IsPut != true -%}
+ {%- endif -%}
+ {%- endif -%}
+ {%-    if operation.IsPut != true -%}
             cache: "no-store",
             headers: await getHeaders("{{ operation.HttpMethodUpper | upcase }}", String(baseUrl)),
-{%- endif -%}
+ {%- endif -%}
         };
   {%-    endif -%}      
 
@@ -47,16 +67,31 @@
         return fetch(url_, options_).then((_response: Response) => {
 {%-    endif -%}
 {%-    if UseTransformResultMethod -%}
-            return this.transformResult(url_, _response, (_response: Response) => this.process{{ operation.ActualOperationNameUpper }}(_response));
+       return this.transformResult(url_, _response, (_response: Response) => this.process{{ operation.ActualOperationNameUpper }}(_response));
 {%-    else -%}
-            return {{ Class | replace: "Client", "" }}_process{{ operation.ActualOperationNameUpper }}(_response);
-{%-    endif -%}
+{%-   endif -%}
+    {%- unless containsTextInCurlyBraces -%}
+       return {{ Class | replace: "Client", "" }}_process{{ operation.ActualOperationNameUpper }}(_response);
+    {%- else -%}
+       return {{ Class | replace: "Client", "" }}_process{{ operation.ActualOperationNameUpper }}{{firstParameter}}(_response);
+    {%- endunless -%}
         });
     }
-
-    function {{ Class | replace: "Client", "" }}_process{{ operation.ActualOperationNameUpper }}(response: Response): Promise<any> {
-        const status = response.status;
-        {% template Client.ProcessResponse %}
+   {% if operation.IsPost == true or operation.IsPut == true %}
+   function {{ Class | replace: "Client", "" }}_process{{ operation.ActualOperationNameUpper }}(response: Response): Promise<any> {
+       const status = response.status;
+       {% template Client.ProcessResponse %}
+  {% else %}
+   {% unless containsTextInCurlyBraces %}
+  function {{ Class | replace: "Client", "" }}_process{{ operation.ActualOperationNameUpper }}(response: Response): Promise<any> {
+      const status = response.status;
+      {% template Client.ProcessResponse %}
+      {% else %}
+  function {{ Class | replace: "Client", "" }}_process{{ operation.ActualOperationNameUpper }}{{firstParameter}}(response: Response): Promise<any> {
+      const status = response.status;
+       {% template Client.ProcessResponse %}
+       {% endunless %}
+      {% endif %}
     }
 {% endfor -%}
 {%- endif -%}

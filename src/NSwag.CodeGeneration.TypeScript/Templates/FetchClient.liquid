@@ -70,11 +70,15 @@ export async function {{ operation.MethodAccessModifier }}{{ Class | replace: "C
        return this.transformResult(url_, _response, (_response: Response) => this.process{{ operation.ActualOperationNameUpper }}(_response));
 {%-    else -%}
 {%-   endif -%}
-    {%- unless containsTextInCurlyBraces -%}
-       return {{ Class | replace: "Client", "" }}_process{{ operation.ActualOperationNameUpper }}(_response);
+   {% if operation.IsPost == true or operation.IsPut == true %}
+            return {{ Class | replace: "Client", "" }}_process{{ operation.ActualOperationNameUpper }}(_response);
     {%- else -%}
-       return {{ Class | replace: "Client", "" }}_process{{ operation.ActualOperationNameUpper }}{{firstParameter}}(_response);
-    {%- endunless -%}
+        {% unless containsTextInCurlyBraces %}
+           return {{ Class | replace: "Client", "" }}_process{{ operation.ActualOperationNameUpper }}(_response);
+     {% else %}
+                return {{ Class | replace: "Client", "" }}_process{{ operation.ActualOperationNameUpper }}{{firstParameter}}(_response);
+      {% endunless %}
+    {%-    endif -%}
         });
     }
    {% if operation.IsPost == true or operation.IsPut == true %}

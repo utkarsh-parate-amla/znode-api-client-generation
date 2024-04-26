@@ -8,6 +8,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 using NJsonSchema.CodeGeneration.TypeScript;
 
 namespace NSwag.CodeGeneration.TypeScript.Models
@@ -122,5 +123,8 @@ namespace NSwag.CodeGeneration.TypeScript.Models
 
         /// <summary>Gets a value indicating whether to include the httpContext (Angular template only, default: false).</summary>
         public bool IncludeHttpContext => _settings.IncludeHttpContext;
+
+        /// <summary>Gets a value indicating whether to include the API version.</summary>
+        public string Version => _document.Info.Version;
     }
 }

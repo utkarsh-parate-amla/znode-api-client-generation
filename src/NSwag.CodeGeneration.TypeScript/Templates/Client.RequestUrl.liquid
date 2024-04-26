@@ -34,8 +34,8 @@ options_ = addCacheOption(filter ?? [], options_);
 let url_ = baseUrl + "{{ operation.Path }}{% if operation.HasQueryParameters %}{% endif %}";
 {%     if operation.HasQueryParameters -%}
 {%     if operation.IsGetOrDeleteOrHead == true or  operation.IsPost == true-%}
-       url_ += BuildEndpointQueryString({% for parameter in operation.QueryParameters %} {{parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %});
-    {%         endif -%}
+       url_ += BuildEndpointQueryString({% raw %}{{% endraw %}{% for parameter in operation.QueryParameters %} {{parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %}{% raw %}}{% endraw %});
+{%         endif -%}
     {%     endif -%}
 {% for parameter in operation.PathParameters -%}
 {%    if parameter.IsRequired -%}

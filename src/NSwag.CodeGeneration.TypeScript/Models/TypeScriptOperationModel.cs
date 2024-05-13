@@ -119,6 +119,9 @@ namespace NSwag.CodeGeneration.TypeScript.Models
         /// <summary>Gets a value indicating Cache Enable/Disable</summary>
         public bool IsCacheEnabled => _operation?.Tags?.Count > 0 ? _operation.Tags.Any(tag => tag.Equals("CacheEnabledAttribute")) : false;
 
+        /// <summary>Gets a value indicating cache is required or not</summary>
+        public bool IsCacheRequired => _operation?.Tags?.Count > 0 ? _operation.Tags.Any(tag => tag.Equals("WebstoreCache")) : false;
+
         /// <summary>Gets a value indicating whether to use HttpClient with the Angular template.</summary>
         public bool UseAngularHttpClient => IsAngular && _settings.HttpClass == HttpClass.HttpClient;
 

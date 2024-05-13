@@ -7,6 +7,7 @@
   {%- endif -%}
 {%- endfor -%}
 
+
 {%- if operation.IsGet == true -%}
 let options_: RequestInit = {
   {%- if operation.HasBody -%}
@@ -26,8 +27,12 @@ let options_: RequestInit = {
   {%- endif -%}
   {%- endif -%}
 };
-{%- if filterFound -%}
-options_ = addCacheOption(filter ?? [], options_);
+    {% if operation.IsCacheRequired == true -%}
+        options_ = addCacheOption(cacheInvalidator ?? [], options_);
+    {%- else -%}
+    {%- if filterFound -%}
+        options_ = addCacheOption(filter ?? [], options_);
+    {% endif -%}
 {%- endif -%}
 {%- endif -%}
 

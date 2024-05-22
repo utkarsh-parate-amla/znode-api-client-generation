@@ -151,7 +151,7 @@
 {%     endfor -%}
 {%if operation.HasQueryParameters -%}
     {%if operation.IsGetOrDeleteOrHead == true -%}
-        url_ += BuildEndpointQueryString({% assign parameterNames = "expand,filter,sort,pageIndex,pageSize" | split: "," %}{% for name in parameterNames %}{%- assign param = operation.QueryParameters | where: "VariableName", name | first -%}{%- if param != null -%}  {{ param.VariableName }}{%- else -%}null{%- endif -%}{%- if forloop.last == false -%}, {% endif -%}{% endfor %}{% for parameter in operation.QueryParameters %}{%- unless parameterNames contains parameter.VariableName -%},{{ parameter.VariableName }}{%- endunless -%}{% endfor %});
+        endpoint += BuildEndpointQueryString({% assign parameterNames = "expand,filter,sort,pageIndex,pageSize" | split: "," %}{% for name in parameterNames %}{%- assign param = operation.QueryParameters | where: "VariableName", name | first -%}{%- if param != null -%}  {{ param.VariableName }}{%- else -%}null{%- endif -%}{%- if forloop.last == false -%}, {% endif -%}{% endfor %}{% for parameter in operation.QueryParameters %}{%- unless parameterNames contains parameter.VariableName -%},{{ parameter.VariableName }}{%- endunless -%}{% endfor %});
     {% endif -%}
 {% endif -%}
      HttpResponseMessage  response_ = null;

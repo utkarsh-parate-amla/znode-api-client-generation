@@ -3,7 +3,7 @@
     <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <AssemblyName>dotnet-nswag</AssemblyName>
-    <PackageId>NSwag.ConsoleCore</PackageId>
+    <PackageId>Znode.NSwag.ConsoleCore</PackageId>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>nswag</ToolCommandName>
   </PropertyGroup>

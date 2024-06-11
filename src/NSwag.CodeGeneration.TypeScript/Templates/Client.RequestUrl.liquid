@@ -38,8 +38,8 @@ let options_: RequestInit = {
 
 let url_ = baseUrl + "{{ operation.Path }}{% if operation.HasQueryParameters %}{% endif %}";
 {%     if operation.HasQueryParameters -%}
-{%     if operation.IsGetOrDeleteOrHead == true -%}
-       url_ += BuildEndpointQueryString({% raw %}{{% endraw %}{% for parameter in operation.QueryParameters %} {{parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %}{% raw %}}{% endraw %});
+{%     if operation.IsGetOrDeleteOrHead == true or  operation.IsPost == true or operation.IsPut == true-%}
+url_ += BuildEndpointQueryString({% raw %}{{% endraw %}{% for parameter in operation.QueryParameters %} {{parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %}{% raw %}}{% endraw %});
 {%         endif -%}
     {%     endif -%}
 {% for parameter in operation.PathParameters -%}

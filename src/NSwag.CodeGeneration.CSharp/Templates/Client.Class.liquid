@@ -149,11 +149,16 @@
         {% template Client.Class.PathParameter %}
 {%         endif -%}
 {%     endfor -%}
-{%if operation.HasQueryParameters -%}
-    {%if operation.IsGetOrDeleteOrHead == true -%}
-        endpoint += BuildEndpointQueryString({% assign parameterNames = "expand,filter,sort,pageIndex,pageSize" | split: "," %}{% for name in parameterNames %}{%- assign param = operation.QueryParameters | where: "VariableName", name | first -%}{%- if param != null -%}  {{ param.VariableName }}{%- else -%}null{%- endif -%}{%- if forloop.last == false -%}, {% endif -%}{% endfor %}{% for parameter in operation.QueryParameters %}{%- unless parameterNames contains parameter.VariableName -%},{{ parameter.VariableName }}{%- endunless -%}{% endfor %});
-    {% endif -%}
-{% endif -%}
+{% if operation.HasQueryParameters -%}
+    {% assign parameterNames = "expand,filter,sort,pageIndex,pageSize" | split: "," %}
+    {% if operation.IsGetOrDeleteOrHead == true -%}
+        {% if parameterNames contains "expands" %}
+            endpoint += BuildEndpointQueryString({% for name in parameterNames %}{%- assign param = operation.QueryParameters | where: "VariableName", name | first -%}{%- if param != null -%}  {{ param.VariableName }}{%- else -%}null{%- endif -%}{%- if forloop.last == false -%}, {% endif -%}{% endfor %}{% for parameter in operation.QueryParameters %}{%- unless parameterNames contains parameter.VariableName -%},Convert.ToString({{ parameter.VariableName }}){%- endunless -%}{% endfor %});
+        {% else %}
+            endpoint += BuildEndpointQueryString({% assign parameterNames = "filter,sort,pageIndex,pageSize" | split: "," %}{% for name in parameterNames %}{%- assign param = operation.QueryParameters | where: "VariableName", name | first -%}{%- if param != null -%}  {{ param.VariableName }}{%- else -%}null{%- endif -%}{%- if forloop.last == false -%}, {% endif -%}{% endfor %}{% for parameter in operation.QueryParameters %}{%- unless parameterNames contains parameter.VariableName -%},Convert.ToString({{ parameter.VariableName }}){%- endunless -%}{% endfor %});
+        {% endif %}
+    {% endif %}
+{% endif %}
      HttpResponseMessage  response_ = null;
      var disposeResponse_ = true;
 

@@ -14,6 +14,10 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
 using NSwag.AssemblyLoader.Utilities;
 using NSwag.Commands.Generation;
 using NSwag.Commands.Generation.AspNetCore;
@@ -74,33 +78,71 @@ namespace NSwag.Commands
             });
         }
 
+
+
         /// <summary>Executes the document.</summary>
         /// <returns>The task.</returns>
         public override async Task<OpenApiDocumentExecutionResult> ExecuteAsync()
         {
             var document = await GenerateSwaggerDocumentAsync();
-            document.TagName = TagName;
-            var tasks = new List<Task>();
-            foreach (var codeGenerator in CodeGenerators.Items)
+            string jsonString = JsonConvert.SerializeObject(document, Formatting.Indented);
+
+            JObject json = JObject.Parse(jsonString);
+            List<string> tags = new List<string>();
+
+            foreach (var path in json["paths"])
             {
-                if (string.IsNullOrEmpty(codeGenerator.OutputFilePath))
+                foreach (var method in path.First)
                 {
-                    continue;
+                    var methodObject = method.First as JObject;
+                    var methodTags = methodObject["tags"] as JArray;
+                    if (methodTags != null)
+                    {
+                        foreach (var tag in methodTags)
+                        {
+                            if (!tags.Contains(tag.ToString()))
+                            {
+                                tags.Add(tag.ToString());
+                            }
+                        }
+                    }
                 }
-                document.OutPutFilePathTypeScript = codeGenerator.OutputFilePath;
-
-                tasks.Add(Task.Run(async () =>
-                {
-                    await Task.Yield();
-
-                    codeGenerator.Input = document;
-                    await codeGenerator.RunAsync(null, null);
-                    codeGenerator.Input = null;
-                }));
             }
 
-            await Task.WhenAll(tasks);
+            foreach (string tag in tags)
+            {
+                document.TagName = tag;
+                var tasks = new List<Task>();
+                foreach (var codeGenerator in CodeGenerators.Items)
+                {
+                    if (string.IsNullOrEmpty(codeGenerator.OutputFilePath))
+                    {
+                        continue;
+                    }
+ 
+                    // Find the position of the last backslash
+                    int lastBackslashIndex = codeGenerator.OutputFilePath.LastIndexOf('\\');
 
+                    // Extract the directory part of the path
+                    string directory = codeGenerator.OutputFilePath.Substring(0, lastBackslashIndex);
+
+                    // Combine the directory with the new file name to create the new path
+                    string newPath = directory + "\\" + tag;
+
+                    document.OutPutFilePathTypeScript = newPath + ".ts";
+                    codeGenerator.OutputFilePath = document.OutPutFilePathTypeScript;
+                    tasks.Add(Task.Run(async () =>
+                    {
+                        await Task.Yield();
+
+                        codeGenerator.Input = document;
+                        await codeGenerator.RunAsync(null, null);
+                        codeGenerator.Input = null;
+                    }));
+                }
+
+                await Task.WhenAll(tasks);
+            }
             return new OpenApiDocumentExecutionResult(null, null, true);
         }
 

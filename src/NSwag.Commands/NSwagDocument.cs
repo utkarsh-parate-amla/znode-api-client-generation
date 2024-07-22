@@ -136,7 +136,7 @@ namespace NSwag.Commands
                         // Combine the directory with the new file name to create the new path
                         string newPath = directory + "\\" + tag;
 
-                        document.OutPutFilePathTypeScript = newPath + ".ts";
+                        document.OutPutFilePathTypeScript = newPath + "Client.ts";
                         codeGenerator.OutputFilePath = document.OutPutFilePathTypeScript;
                         tasks.Add(Task.Run(async () =>
                         {

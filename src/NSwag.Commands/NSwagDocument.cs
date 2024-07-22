@@ -153,7 +153,27 @@ namespace NSwag.Commands
             }
             else
             {
+                document.TagName = TagName;
+                var tasks = new List<Task>();
+                foreach (var codeGenerator in CodeGenerators.Items)
+                {
+                    if (string.IsNullOrEmpty(codeGenerator.OutputFilePath))
+                    {
+                        continue;
+                    }
+                    document.OutPutFilePathTypeScript = codeGenerator.OutputFilePath;
 
+                    tasks.Add(Task.Run(async () =>
+                    {
+                        await Task.Yield();
+
+                        codeGenerator.Input = document;
+                        await codeGenerator.RunAsync(null, null);
+                        codeGenerator.Input = null;
+                    }));
+                }
+
+                await Task.WhenAll(tasks);
             }
             return new OpenApiDocumentExecutionResult(null, null, true);
         }

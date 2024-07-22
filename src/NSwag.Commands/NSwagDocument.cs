@@ -87,61 +87,73 @@ namespace NSwag.Commands
             var document = await GenerateSwaggerDocumentAsync();
             string jsonString = JsonConvert.SerializeObject(document, Formatting.Indented);
 
-            JObject json = JObject.Parse(jsonString);
-            List<string> tags = new List<string>();
+            bool skipMultipleFilesCreation = false;
 
-            foreach (var path in json["paths"])
+            if ((bool)(CodeGenerators?.OpenApiToCSharpClientCommand != null) && (bool)CodeGenerators?.OpenApiToTypeScriptClientCommand?.OutputFilePath?.TrimEnd('\\')?.ToLower()?.Contains("interface"))
+                skipMultipleFilesCreation = true;
+
+            if (!skipMultipleFilesCreation)
             {
-                foreach (var method in path.First)
+                JObject json = JObject.Parse(jsonString);
+                List<string> tags = new List<string>();
+
+                foreach (var path in json["paths"])
                 {
-                    var methodObject = method.First as JObject;
-                    var methodTags = methodObject["tags"] as JArray;
-                    if (methodTags != null)
+                    foreach (var method in path.First)
                     {
-                        foreach (var tag in methodTags)
+                        var methodObject = method.First as JObject;
+                        var methodTags = methodObject["tags"] as JArray;
+                        if (methodTags != null)
                         {
-                            if (!tags.Contains(tag.ToString()))
+                            foreach (var tag in methodTags)
                             {
-                                tags.Add(tag.ToString());
+                                if (!tags.Contains(tag.ToString()))
+                                {
+                                    tags.Add(tag.ToString());
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            foreach (string tag in tags)
-            {
-                document.TagName = tag;
-                var tasks = new List<Task>();
-                foreach (var codeGenerator in CodeGenerators.Items)
+                foreach (string tag in tags)
                 {
-                    if (string.IsNullOrEmpty(codeGenerator.OutputFilePath))
+                    document.TagName = tag;
+                    var tasks = new List<Task>();
+                    foreach (var codeGenerator in CodeGenerators.Items)
                     {
-                        continue;
+                        if (string.IsNullOrEmpty(codeGenerator.OutputFilePath))
+                        {
+                            continue;
+                        }
+
+                        // Find the position of the last backslash
+                        int lastBackslashIndex = codeGenerator.OutputFilePath.LastIndexOf('\\');
+
+                        // Extract the directory part of the path
+                        string directory = codeGenerator.OutputFilePath.Substring(0, lastBackslashIndex);
+
+                        // Combine the directory with the new file name to create the new path
+                        string newPath = directory + "\\" + tag;
+
+                        document.OutPutFilePathTypeScript = newPath + ".ts";
+                        codeGenerator.OutputFilePath = document.OutPutFilePathTypeScript;
+                        tasks.Add(Task.Run(async () =>
+                        {
+                            await Task.Yield();
+
+                            codeGenerator.Input = document;
+                            await codeGenerator.RunAsync(null, null);
+                            codeGenerator.Input = null;
+                        }));
                     }
- 
-                    // Find the position of the last backslash
-                    int lastBackslashIndex = codeGenerator.OutputFilePath.LastIndexOf('\\');
 
-                    // Extract the directory part of the path
-                    string directory = codeGenerator.OutputFilePath.Substring(0, lastBackslashIndex);
-
-                    // Combine the directory with the new file name to create the new path
-                    string newPath = directory + "\\" + tag;
-
-                    document.OutPutFilePathTypeScript = newPath + ".ts";
-                    codeGenerator.OutputFilePath = document.OutPutFilePathTypeScript;
-                    tasks.Add(Task.Run(async () =>
-                    {
-                        await Task.Yield();
-
-                        codeGenerator.Input = document;
-                        await codeGenerator.RunAsync(null, null);
-                        codeGenerator.Input = null;
-                    }));
+                    await Task.WhenAll(tasks);
                 }
+            }
+            else
+            {
 
-                await Task.WhenAll(tasks);
             }
             return new OpenApiDocumentExecutionResult(null, null, true);
         }

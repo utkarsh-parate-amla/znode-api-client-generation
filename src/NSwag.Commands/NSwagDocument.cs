@@ -89,7 +89,7 @@ namespace NSwag.Commands
 
             bool skipMultipleFilesCreation = false;
 
-            if ((bool)(CodeGenerators?.OpenApiToCSharpClientCommand == null) || (bool)CodeGenerators?.OpenApiToTypeScriptClientCommand?.OutputFilePath?.TrimEnd('\\')?.ToLower()?.Contains("interface"))
+            if ((bool)(CodeGenerators?.OpenApiToCSharpClientCommand == null) || (bool)(CodeGenerators?.OpenApiToTypeScriptClientCommand?.OutputFilePath?.TrimEnd('\\')?.ToLower()?.Contains("interface") == true))
                 skipMultipleFilesCreation = true;
 
             if (!skipMultipleFilesCreation)

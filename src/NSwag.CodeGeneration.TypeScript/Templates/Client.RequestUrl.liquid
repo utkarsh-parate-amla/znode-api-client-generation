@@ -37,11 +37,33 @@ let options_: RequestInit = {
 {%- endif -%}
 
 let url_ = baseUrl + "{{ operation.Path }}{% if operation.HasQueryParameters %}{% endif %}";
-{%     if operation.HasQueryParameters -%}
-{%     if operation.IsGetOrDeleteOrHead == true or  operation.IsPost == true or operation.IsPut == true-%}
-url_ += BuildEndpointQueryString({% raw %}{{% endraw %}{% for parameter in operation.QueryParameters %} {{parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %}{% raw %}}{% endraw %});
-{%         endif -%}
-    {%     endif -%}
+{% if operation.HasQueryParameters -%}
+    {% assign hasSpecialParameters = false %}
+    {% for parameter in operation.QueryParameters -%}
+        {% if parameter.Name == "expand" or parameter.Name == "filter" or parameter.Name == "sort" or parameter.Name == "pageIndex" or parameter.Name == "pageSize" %}
+            {% assign hasSpecialParameters = true %}
+        {% endif %}
+    {% endfor -%}
+
+    {% if hasSpecialParameters %}
+        {% if operation.IsGetOrDeleteOrHead == true or  operation.IsPost == true or operation.IsPut == true -%}
+            url_ += BuildEndpointQueryString({% raw %}{{% endraw %}{% for parameter in operation.QueryParameters %} {{parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %}{% raw %}}{% endraw %});
+        {% endif -%}
+    {% endif -%}
+
+    {% for parameter in operation.QueryParameters -%}
+        {% if parameter.IsOptional and parameter.Name != "expand" and parameter.Name != "filter" and parameter.Name != "sort" and parameter.Name != "pageIndex" and parameter.Name != "pageSize" %}
+            {% if parameter.VariableName != null %}
+                {% if parameter.VariableName != undefined %}
+                    url_ += (url_.indexOf('?') === -1 ? '?' : '&') + "{{ parameter.Name }}=" + encodeURIComponent("" + {{ parameter.VariableName }});
+                {% endif %}
+            {% endif %}
+        {% elsif parameter.IsOptional == false %}
+            url_ += (url_.indexOf('?') === -1 ? '?' : '&') + "{{ parameter.Name }}=" + encodeURIComponent("" + {{ parameter.VariableName }});
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
 {% for parameter in operation.PathParameters -%}
 {%    if parameter.IsRequired -%}
 if ({{ parameter.VariableName }} === undefined || {{ parameter.VariableName }} === null)

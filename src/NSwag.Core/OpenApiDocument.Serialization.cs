@@ -220,8 +220,16 @@ namespace NSwag
             set;
         }
 
+        /// <summary>Gets or sets the client suffix for the document.</summary>
+        [JsonProperty(PropertyName = "ClientSuffix", Order = 18, DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        public string ClientSuffix
+        {
+            get;
+            set;
+        }
+
         /// <summary>Gets or sets the base path on which the API is served, which is relative to the <see cref="Host"/>.</summary>
-        [JsonProperty(PropertyName = "OutPutFilePathTypeScript", Order = 18, DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty(PropertyName = "OutPutFilePathTypeScript", Order = 19, DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string OutPutFilePathTypeScript
         {
             get;

@@ -154,6 +154,7 @@ namespace NSwag.Commands
             else
             {
                 document.TagName = TagName;
+                document.ClientSuffix = ClientSuffix;
                 var tasks = new List<Task>();
                 foreach (var codeGenerator in CodeGenerators.Items)
                 {

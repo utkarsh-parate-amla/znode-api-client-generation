@@ -52,6 +52,8 @@
                     <TextBox Margin="0,0,0,12" Text="{Binding Document.Document.DefaultVariables}" />
                     <TextBlock Margin="0,0,0,4" Text="Tag Name" TextWrapping="Wrap" FontWeight="Bold" />
                     <TextBox Margin="0,0,0,12" Text="{Binding Document.Document.TagName}" />
+                    <TextBlock Margin="0,0,0,4" Text="Client Suffix" TextWrapping="Wrap" FontWeight="Bold" />
+                    <TextBox Margin="0,0,0,12" Text="{Binding Document.Document.ClientSuffix}" />
 
 
                 </StackPanel>

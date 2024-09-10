@@ -65,6 +65,9 @@ namespace NSwag.Commands
         /// <summary>Gets or sets the tag name.</summary>
         public string TagName { get; set; }
 
+        /// <summary>Gets or sets the client suffix name.</summary>
+        public string ClientSuffix { get; set; }
+
         /// <summary>Gets or sets the selected swagger generator JSON.</summary>
         [JsonProperty("DocumentGenerator")]
         internal JObject SelectedSwaggerGeneratorRaw

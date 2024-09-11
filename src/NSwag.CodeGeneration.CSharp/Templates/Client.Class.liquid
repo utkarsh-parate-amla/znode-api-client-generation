@@ -158,8 +158,11 @@
             endpoint += BuildEndpointQueryString({% assign parameterNames = "filter,sort,pageIndex,pageSize" | split: "," %}{% for name in parameterNames %}{%- assign param = operation.QueryParameters | where: "VariableName", name | first -%}{%- if param != null -%}  {{ param.VariableName }}{%- else -%}null{%- endif -%}{%- if forloop.last == false -%}, {% endif -%}{% endfor %});
         {% endif %}
 {% for parameter in operation.QueryParameters %}
-    endpoint += "&{{ parameter.VariableName }}="+{{ parameter.VariableName }};
+    {% unless parameter.VariableName == "expand" or parameter.VariableName == "filter" or parameter.VariableName == "sort" or parameter.VariableName == "pageIndex" or parameter.VariableName == "pageSize" %}
+        endpoint += "&{{ parameter.VariableName }}=" + {{ parameter.VariableName }};
+    {% endunless %}
 {% endfor %}
+
     {% endif %}
 {% endif %}
      HttpResponseMessage  response_ = null;

@@ -94,6 +94,7 @@ namespace NSwag.Commands
 
             if (!skipMultipleFilesCreation)
             {
+                document.ClientSuffix = ClientSuffix;
                 JObject json = JObject.Parse(jsonString);
                 List<string> tags = new List<string>();
 

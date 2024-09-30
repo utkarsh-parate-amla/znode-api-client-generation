@@ -206,7 +206,7 @@ namespace NSwag.CodeGeneration
                     operationModel.Path = path;
                     operationModel.HttpMethod = httpMethod;
                     operationModel.OperationName = operationName;
-
+                    operationModel.ClientSuffix = document.ClientSuffix;
                     // Adding TagName logic
                     List<string> tagList = document?.TagName?.Split(',')?.ToList();
 

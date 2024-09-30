@@ -75,6 +75,9 @@ namespace NSwag.CodeGeneration.Models
         /// <summary>Gets or sets the name of the operation.</summary>
         public string OperationName { get; set; }
 
+        public string ClientSuffix { get; set; }
+
+
         /// <summary>Gets the actual name of the operation (language specific).</summary>
         public abstract string ActualOperationName { get; }
 
@@ -105,8 +108,11 @@ namespace NSwag.CodeGeneration.Models
 		public bool IsGet =>
 			HttpMethod == OpenApiOperationMethod.Get;
 
-		/// <summary>Gets a value indicating whether the HTTP method is GET or HEAD.</summary>
-		public bool IsGetOrHead => HttpMethod == OpenApiOperationMethod.Get || HttpMethod == OpenApiOperationMethod.Head;
+        /// <summary>Gets a value indicating whether the HTTP method is GET or DELETE or HEAD.</summary>
+        public string MethodType => char.ToUpper(HttpMethod[0]) + HttpMethod.Substring(1);
+
+        /// <summary>Gets a value indicating whether the HTTP method is GET or HEAD.</summary>
+        public bool IsGetOrHead => HttpMethod == OpenApiOperationMethod.Get || HttpMethod == OpenApiOperationMethod.Head;
 
         // TODO: Remove this (may not work correctly)
         /// <summary>Gets or sets a value indicating whether the operation has a result type (i.e. not void).</summary>

@@ -126,7 +126,14 @@ return {{ operation.ActualOperationName }}Async({% for parameter in operation.Pa
 
 {% endif %}
 {
+{% if operation.ClientSuffix == "v2" %}
+
+{% if operation.HasResult or operation.WrapResponse %}return {% endif %}System.Threading.Tasks.Task.Run(async () => await {{operation.MethodType}}_{{ operation.ActualOperationName }}Async({% for parameter in operation.Parameters %}{{ parameter.VariableName }}, {% endfor %}System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
+{% else %}
 {% if operation.HasResult or operation.WrapResponse %}return {% endif %}System.Threading.Tasks.Task.Run(async () => await {{ operation.ActualOperationName }}Async({% for parameter in operation.Parameters %}{{ parameter.VariableName }}, {% endfor %}System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
+
+{% endif %}
+
 }
 
 {%     endif -%}

@@ -3,11 +3,14 @@
 //     Generated using the NSwag toolchain v{{ ToolchainVersion }} (http://NSwag.org)
 // </auto-generated>
 //----------------------
-import { CONFIG } from "constants/index";
-const baseUrl = CONFIG.BASE_URL;
-import { addCacheOption,BuildEndpointQueryString,getHeaders } from "@api/BaseClient";
-import * as Models from "@api/ZnodeWebstoreMultifrontInterface";
-import {FilterTuple} from "@api/ZnodeWebstoreMultifrontInterface";
+
+import * as Models from "./multifront-types";
+import { addCacheOption, buildEndpointQueryString, getHeaders } from "./base";
+import { FilterTuple } from "./multifront-types";
+import * as MultifrontTypes  from "./multifront-types"
+
+const baseUrl = process.env.API_URL;
+
 
 {% template File.Header %}
 

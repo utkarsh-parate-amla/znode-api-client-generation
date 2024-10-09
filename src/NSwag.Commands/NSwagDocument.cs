@@ -137,7 +137,7 @@ namespace NSwag.Commands
                         // Combine the directory with the new file name to create the new path
                         string newPath = directory + "\\" + tag;
 
-                        document.OutPutFilePathTypeScript = newPath + "Client.ts";
+                        document.OutPutFilePathTypeScript = ConvertToRequiredCase(newPath) + ".ts";
                         codeGenerator.OutputFilePath = document.OutPutFilePathTypeScript;
                         tasks.Add(Task.Run(async () =>
                         {
@@ -178,6 +178,14 @@ namespace NSwag.Commands
                 await Task.WhenAll(tasks);
             }
             return new OpenApiDocumentExecutionResult(null, null, true);
+        }
+
+
+        public static string ConvertToRequiredCase(string input)
+        {
+            // Use Regex to insert a dash before each uppercase letter, except at the start
+            string result = Regex.Replace(input, "([a-z])([A-Z])", "$1-$2").ToLower();
+            return result;
         }
 
         /// <summary>Executes the document via command line.</summary>

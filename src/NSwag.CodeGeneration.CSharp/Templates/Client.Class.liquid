@@ -185,11 +185,28 @@ endpoint = endpoint.Replace("/{{ "{" }}{{ parameter.Name }}}", string.Empty);
 {% if operation.HasQueryParameters -%}
 {% assign parameterNames = "expand,filter,sort,pageIndex,pageSize" | split: "," %}
 {% if operation.IsGetOrDeleteOrHead == true -%}
-{% if parameterNames contains "expand" %}
-endpoint += BuildEndpointQueryString({% for name in parameterNames %}{%- assign param = operation.QueryParameters | where: "VariableName", name | first -%}{%- if param != null -%}  {{ param.VariableName }}{%- else -%}null{%- endif -%}{%- if forloop.last == false -%}, {% endif -%}{% endfor %});
-{% else %}
-endpoint += BuildEndpointQueryString({% assign parameterNames = "filter,sort,pageIndex,pageSize" | split: "," %}{% for name in parameterNames %}{%- assign param = operation.QueryParameters | where: "VariableName", name | first -%}{%- if param != null -%}  {{ param.VariableName }}{%- else -%}null{%- endif -%}{%- if forloop.last == false -%}, {% endif -%}{% endfor %});
+{% assign queryParams = "" %}
+{% assign nullCount = 0 %}
+
+{% for name in parameterNames %}
+  {% assign param = operation.QueryParameters | where: "VariableName", name | first %}
+  {% if param != null %}
+    {% assign queryParams = queryParams | append: param.VariableName %}
+  {% else %}
+    {% assign queryParams = queryParams | append: "null" %}
+    {% assign nullCount = nullCount | plus: 1 %}
+  {% endif %}
+  {%- if forloop.last == false -%}
+    {% assign queryParams = queryParams | append: ", " %}
+  {%- endif -%}
+{% endfor %}
+
+{% if nullCount == 5 %}
+  {% assign queryParams = queryParams | split: ", " | slice: 0, 4 | join: ", " %}
 {% endif %}
+
+endpoint += BuildEndpointQueryString({{ queryParams }});
+
 {% endif %}
 
 {% for parameter in operation.QueryParameters %}

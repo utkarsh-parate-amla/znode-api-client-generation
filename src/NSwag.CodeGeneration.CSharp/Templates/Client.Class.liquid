@@ -188,7 +188,7 @@ endpoint = endpoint.Replace("/{{ "{" }}{{ parameter.Name }}}", string.Empty);
 {% if parameterNames contains "expands" %}
 endpoint += BuildEndpointQueryString({% for name in parameterNames %}{%- assign param = operation.QueryParameters | where: "VariableName", name | first -%}{%- if param != null -%}  {{ param.VariableName }}{%- else -%}null{%- endif -%}{%- if forloop.last == false -%}, {% endif -%}{% endfor %});
 {% else %}
-endpoint += BuildEndpointQueryString({% assign parameterNames = "filter,sort,pageIndex,pageSize" | split: "," %}{% for name in parameterNames %}{%- assign param = operation.QueryParameters | where: "VariableName", name | first -%}{%- if param != null -%}  {{ param.VariableName }}{%- else -%}null{%- endif -%}{%- if forloop.last == false -%}, {% endif -%}{% endfor %});
+endpoint += BuildEndpointQueryString({% assign parameterNames = "expand,filter,sort,pageIndex,pageSize" | split: "," %}{% for name in parameterNames %}{%- assign param = operation.QueryParameters | where: "VariableName", name | first -%}{%- if param != null -%}  {{ param.VariableName }}{%- else -%}null{%- endif -%}{%- if forloop.last == false -%}, {% endif -%}{% endfor %});
 {% endif %}
 {% endif %}
 

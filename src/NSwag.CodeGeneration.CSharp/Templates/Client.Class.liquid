@@ -14,6 +14,8 @@ private System.Lazy<{{ JsonSerializerSettingsType }}> _responseSettings;
 {% else -%}
 private System.Lazy<{{ JsonSerializerSettingsType }}> _settings;
 {% endif -%}
+{% assign firstVariableName = "" %}
+{% assign index = 0 %}
 
 {% if HasConfigurationClass -%}
 public {{ Class }}({{ ConfigurationClass }} configuration{% if InjectHttpClient %}, {{ HttpClientType }} httpClient{% endif %}) : base(configuration)
@@ -95,19 +97,31 @@ partial void PrepareRequest({{ HttpClientType }} client, System.Net.Http.HttpReq
 partial void ProcessResponse({{ HttpClientType }} client, System.Net.Http.HttpResponseMessage response);
 {% endif -%}
 {% for operation in Operations %}
+{% for parameter in operation.PathParameters %}
+    {% if index == 0 %}
+        {% assign firstVariableName = parameter.VariableName %}
+    {% endif %}
+    {% assign index = index | plus: 1 %}
+{% endfor %}
+
+{% if variableName != "" %}
+    {% assign firstValue = "By_" | append: firstVariableName %}
+{% else %}
+    {% assign firstValue = "" %}
+{% endif %}
 {%     if GenerateOptionalParameters == false -%}
 {% template Client.Method.Documentation %}
 {% template Client.Method.Annotations %}
 {% if operation.ClientSuffix == "v2" %}
 
-{{ operation.MethodAccessModifier }} virtual {{ operation.ResultType }} {{operation.MethodType}}_{{ operation.ActualOperationName }}Async({% for parameter in operation.Parameters %}{{ parameter.Type }} {{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %})
+{{ operation.MethodAccessModifier }} virtual {{ operation.ResultType }} {{operation.MethodType}}_{{ operation.ActualOperationName }}{{ firstValue }}Async({% for parameter in operation.Parameters %}{{ parameter.Type }} {{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %})
 {% else %}
 {{ operation.MethodAccessModifier }} virtual {{ operation.ResultType }} {{ operation.ActualOperationName }}Async({% for parameter in operation.Parameters %}{{ parameter.Type }} {{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %})
 
 {% endif %}
 {
 {% if operation.ClientSuffix == "v2" %}
-return {{ operation.MethodType}}_{{ operation.ActualOperationName }}Async({% for parameter in operation.Parameters %}{{ parameter.VariableName }}, {% endfor %}System.Threading.CancellationToken.None);
+return {{ operation.MethodType}}_{{ operation.ActualOperationName }}{{ firstValue }}Async({% for parameter in operation.Parameters %}{{ parameter.VariableName }}, {% endfor %}System.Threading.CancellationToken.None);
 
 {% else %}
 return {{ operation.ActualOperationName }}Async({% for parameter in operation.Parameters %}{{ parameter.VariableName }}, {% endfor %}System.Threading.CancellationToken.None);
@@ -120,7 +134,7 @@ return {{ operation.ActualOperationName }}Async({% for parameter in operation.Pa
 
 {% if operation.ClientSuffix == "v2" %}
 
-{{ operation.MethodAccessModifier }} virtual {{ operation.SyncResultType }} {{operation.MethodType}}_{{ operation.ActualOperationName }}({% for parameter in operation.Parameters %}{{ parameter.Type }} {{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %})
+{{ operation.MethodAccessModifier }} virtual {{ operation.SyncResultType }} {{operation.MethodType}}_{{ operation.ActualOperationName }}{{ firstValue }}({% for parameter in operation.Parameters %}{{ parameter.Type }} {{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %})
 {% else %}
 {{ operation.MethodAccessModifier }} virtual {{ operation.SyncResultType }} {{ operation.ActualOperationName }}({% for parameter in operation.Parameters %}{{ parameter.Type }} {{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %})
 
@@ -128,7 +142,7 @@ return {{ operation.ActualOperationName }}Async({% for parameter in operation.Pa
 {
 {% if operation.ClientSuffix == "v2" %}
 
-{% if operation.HasResult or operation.WrapResponse %}return {% endif %}System.Threading.Tasks.Task.Run(async () => await {{operation.MethodType}}_{{ operation.ActualOperationName }}Async({% for parameter in operation.Parameters %}{{ parameter.VariableName }}, {% endfor %}System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
+{% if operation.HasResult or operation.WrapResponse %}return {% endif %}System.Threading.Tasks.Task.Run(async () => await {{operation.MethodType}}_{{ operation.ActualOperationName }}{{ firstValue }}Async({% for parameter in operation.Parameters %}{{ parameter.VariableName }}, {% endfor %}System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
 {% else %}
 {% if operation.HasResult or operation.WrapResponse %}return {% endif %}System.Threading.Tasks.Task.Run(async () => await {{ operation.ActualOperationName }}Async({% for parameter in operation.Parameters %}{{ parameter.VariableName }}, {% endfor %}System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
 
@@ -143,7 +157,7 @@ return {{ operation.ActualOperationName }}Async({% for parameter in operation.Pa
 
 {% if operation.ClientSuffix == "v2" %}
 
-{{ operation.MethodAccessModifier }} virtual async {{ operation.ResultType }} {{operation.MethodType}}_{{ operation.ActualOperationName }}Async({% for parameter in operation.Parameters %}{{ parameter.Type }} {{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}, {% endfor %}System.Threading.CancellationToken cancellationToken{% if GenerateOptionalParameters %} = default(System.Threading.CancellationToken){% endif %})
+{{ operation.MethodAccessModifier }} virtual async {{ operation.ResultType }} {{operation.MethodType}}_{{ operation.ActualOperationName }}{{ firstValue }}Async({% for parameter in operation.Parameters %}{{ parameter.Type }} {{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}, {% endfor %}System.Threading.CancellationToken cancellationToken{% if GenerateOptionalParameters %} = default(System.Threading.CancellationToken){% endif %})
 {% else %}
 {{ operation.MethodAccessModifier }} virtual async {{ operation.ResultType }} {{ operation.ActualOperationName }}Async({% for parameter in operation.Parameters %}{{ parameter.Type }} {{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}, {% endfor %}System.Threading.CancellationToken cancellationToken{% if GenerateOptionalParameters %} = default(System.Threading.CancellationToken){% endif %})
 

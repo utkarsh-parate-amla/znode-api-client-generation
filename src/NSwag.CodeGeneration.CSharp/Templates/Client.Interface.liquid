@@ -5,7 +5,7 @@ public partial interface I{{ Class }}{% if HasClientBaseInterface %} : {{ Client
 {
     {% template Client.Interface.Body %}
     {% for operation in InterfaceOperations -%}
-    {% assign firstVariableName = "" %}
+{% assign firstVariableName = "" %}
 {% assign index = 0 %}
 
 {% for parameter in operation.PathParameters %}
@@ -15,8 +15,10 @@ public partial interface I{{ Class }}{% if HasClientBaseInterface %} : {{ Client
     {% assign index = index | plus: 1 %}
 {% endfor %}
 
-{% if variableName != "" %}
-    {% assign firstValue = "By_" | append: firstVariableName %}
+{% assign capitalizedFirstVariableName = firstVariableName | capitalize %}
+
+{% if firstVariableName != "" %}
+    {% assign firstValue = "By" | append: capitalizedFirstVariableName %}
 {% else %}
     {% assign firstValue = "" %}
 {% endif %}
@@ -24,7 +26,7 @@ public partial interface I{{ Class }}{% if HasClientBaseInterface %} : {{ Client
             {% template Client.Method.Documentation %}
             {% template Client.Method.Annotations %}
             {% if operation.ClientSuffix == "v2" %}
-                {{ operation.ResultType }} {{operation.MethodType}}_{{ operation.ActualOperationName }}{{ firstValue }}Async({% for parameter in operation.Parameters %}{{ parameter.Type }} {{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %});
+                {{ operation.ResultType }} {{operation.MethodType}}{{ operation.ActualOperationName }}{{ firstValue }}Async({% for parameter in operation.Parameters %}{{ parameter.Type }} {{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %});
             {% else %}
                 {{ operation.ResultType }} {{ operation.ActualOperationName }}Async({% for parameter in operation.Parameters %}{{ parameter.Type }} {{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %});
             {% endif %}
@@ -34,7 +36,7 @@ public partial interface I{{ Class }}{% if HasClientBaseInterface %} : {{ Client
             {% template Client.Method.Documentation %}
             {% template Client.Method.Annotations %}
             {% if operation.ClientSuffix == "v2" %}
-                {{ operation.SyncResultType }} {{operation.MethodType}}_{{ operation.ActualOperationName }}{{ firstValue }}({% for parameter in operation.Parameters %}{{ parameter.Type }} {{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %});
+                {{ operation.SyncResultType }} {{operation.MethodType}}{{ operation.ActualOperationName }}{{ firstValue }}({% for parameter in operation.Parameters %}{{ parameter.Type }} {{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %});
             {% else %}
                 {{ operation.SyncResultType }} {{ operation.ActualOperationName }}({% for parameter in operation.Parameters %}{{ parameter.Type }} {{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %});
             {% endif %}
@@ -44,7 +46,7 @@ public partial interface I{{ Class }}{% if HasClientBaseInterface %} : {{ Client
         {% template Client.Method.Documentation %}
         {% template Client.Method.Annotations %}
         {% if operation.ClientSuffix == "v2" %}
-            {{ operation.ResultType }} {{operation.MethodType}}_{{ operation.ActualOperationName }}{{ firstValue }}Async({% for parameter in operation.Parameters %}{{ parameter.Type }} {{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}, {% endfor %}System.Threading.CancellationToken cancellationToken{% if GenerateOptionalParameters %} = default(System.Threading.CancellationToken){% endif %});
+            {{ operation.ResultType }} {{operation.MethodType}}{{ operation.ActualOperationName }}{{ firstValue }}Async({% for parameter in operation.Parameters %}{{ parameter.Type }} {{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}, {% endfor %}System.Threading.CancellationToken cancellationToken{% if GenerateOptionalParameters %} = default(System.Threading.CancellationToken){% endif %});
         {% else %}
             {{ operation.ResultType }} {{ operation.ActualOperationName }}Async({% for parameter in operation.Parameters %}{{ parameter.Type }} {{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}, {% endfor %}System.Threading.CancellationToken cancellationToken{% if GenerateOptionalParameters %} = default(System.Threading.CancellationToken){% endif %});
         {% endif %}

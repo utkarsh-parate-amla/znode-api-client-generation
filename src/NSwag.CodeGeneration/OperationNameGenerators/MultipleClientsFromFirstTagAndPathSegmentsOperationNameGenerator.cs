@@ -7,6 +7,8 @@
 //-----------------------------------------------------------------------
 
 using NJsonSchema;
+using System.Collections.Generic;
+using System;
 using System.Linq;
 
 namespace NSwag.CodeGeneration.OperationNameGenerators
@@ -37,7 +39,15 @@ namespace NSwag.CodeGeneration.OperationNameGenerators
         public virtual string GetOperationName(OpenApiDocument document, string path, string httpMethod, OpenApiOperation operation)
         {
             var operationName = ConvertPathToName(path);
-
+            bool isDuplicate = false;
+            if (document.ClientSuffix == "v2")
+            {
+                isDuplicate = CheckForDuplicatePaths(path, document);
+                if (isDuplicate)
+                {
+                    operationName += operationName + GetSecondToLastValue(path);
+                }
+            }
             if (document.ClientSuffix != "v2")
             {
                 var hasNameConflict = document.Paths
@@ -53,7 +63,63 @@ namespace NSwag.CodeGeneration.OperationNameGenerators
                     operationName += ConversionUtilities.ConvertToUpperCamelCase(httpMethod, false);
                 }
             }
+            
             return operationName;
+        }
+
+        public string GetSecondToLastValue(string path)
+        {
+            // Split the path into segments
+            var pathSegments = path.Split('/');
+
+            // Iterate backwards to find the second-to-last segment that is not enclosed in {}
+            for (int i = pathSegments.Length - 2; i >= 0; i--)
+            {
+                if (!pathSegments[i].StartsWith("{") && !pathSegments[i].EndsWith("}"))
+                {
+                    return pathSegments[i]; // Return the second-to-last value that is not a parameter
+                }
+            }
+
+            return string.Empty; // Return empty string if no match found
+        }
+
+        public bool CheckForDuplicatePaths(string basePathWithParams, OpenApiDocument document)
+        {
+            bool isDuplicate = false; // Initialize the flag
+
+            // Split the base path into segments (e.g., "v2/amla/{portal}/{locale}")
+            var basePathSegments = basePathWithParams.Split('/');
+
+            // Extract the base path (e.g., "v2/amla")
+            string basePath = "/" + string.Join("/", basePathSegments.Take(2)); // Take only the first 2 segments
+
+            // Extract the parameters (e.g., "{portal}", "{locale}")
+            var basePathParams = basePathSegments.Skip(2).Where(s => s.StartsWith("{") && s.EndsWith("}")).ToList();
+
+            // Iterate through the document paths
+            foreach (var pathItem in document.Paths)
+            {
+                // Split the document path into segments
+                var pathSegments = pathItem.Key.Split('/');
+
+                // Check if the path starts with the base path
+                if (pathItem.Key.StartsWith(basePath, StringComparison.OrdinalIgnoreCase))
+                {
+                    // Extract parameters from the matched path (after the base path)
+                    var matchedPathParams = pathSegments.Skip(2).Where(s => s.StartsWith("{") && s.EndsWith("}")).ToList();
+
+                    // Compare the parameters from the provided base path with the matched path parameters
+                    if (basePathParams.SequenceEqual(matchedPathParams, StringComparer.OrdinalIgnoreCase))
+                    {
+                        // Set the flag to true if both path and parameters match
+                        isDuplicate = true;
+                        break; // No need to check further if a duplicate is found
+                    }
+                }
+            }
+
+            return isDuplicate;
         }
 
         /// <summary>Converts the path to an operation name.</summary>

@@ -45,7 +45,7 @@ namespace NSwag.CodeGeneration.OperationNameGenerators
                 isDuplicate = CheckForDuplicatePaths(path, document);
                 if (isDuplicate)
                 {
-                    operationName += operationName + GetSecondToLastValue(path);
+                    operationName += operationName + ConversionUtilities.ConvertToUpperCamelCase(GetSecondToLastValue(path), false);
                 }
             }
             if (document.ClientSuffix != "v2")

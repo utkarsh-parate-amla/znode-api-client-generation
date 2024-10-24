@@ -110,7 +110,7 @@ namespace NSwag.CodeGeneration.OperationNameGenerators
                     var matchedPathParams = pathSegments.Skip(2).Where(s => s.StartsWith("{") && s.EndsWith("}")).ToList();
 
                     // Compare the parameters from the provided base path with the matched path parameters
-                    if (basePathParams.SequenceEqual(matchedPathParams, StringComparer.OrdinalIgnoreCase))
+                    if (basePathParams.Count > 1 && matchedPathParams.Count > 1 && basePathParams.SequenceEqual(matchedPathParams, StringComparer.OrdinalIgnoreCase))
                     {
                         // Set the flag to true if both path and parameters match
                         isDuplicate = true;

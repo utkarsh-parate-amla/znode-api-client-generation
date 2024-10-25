@@ -93,15 +93,17 @@ namespace NSwag.CodeGeneration.OperationNameGenerators
             // Extract the base path (e.g., "v2/amla")
             string basePath = "/" + string.Join("/", basePathSegments.Take(2)); // Take only the first 2 segments
 
-            // Extract the parameters (e.g., "{portal}", "{locale}")
+            //// Extract the parameters (e.g., "{portal}", "{locale}")
             var basePathParams = basePathSegments.Skip(2).Where(s => s.StartsWith("{") && s.EndsWith("}")).ToList();
 
             // Iterate through the document paths
             foreach (var pathItem in document.Paths)
             {
                 // Split the document path into segments
-                var pathSegments = pathItem.Key.Split('/');
+                var pathSegments = pathItem.Key.TrimStart('/').Split('/');
 
+                if (basePathSegments.Count() == pathSegments.Count() && basePathSegments.SequenceEqual(pathSegments))
+                    return false;
                 // Check if the path starts with the base path
                 if (pathItem.Key.StartsWith(basePath, StringComparison.OrdinalIgnoreCase))
                 {

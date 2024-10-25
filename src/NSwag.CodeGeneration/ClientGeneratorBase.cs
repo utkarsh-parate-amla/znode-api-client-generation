@@ -197,17 +197,8 @@ namespace NSwag.CodeGeneration
                     var operationModel = CreateOperationModel(operation, BaseSettings);
                     operationModel.ControllerName = BaseSettings.OperationNameGenerator.GetClientName(document, path, httpMethod, operation);
 
-                    // Adding ClientSuffix logic
-                    if (!string.IsNullOrEmpty(document?.ClientSuffix))
-                    {
-                        path = "/" + path;
-                    }
-
                     operationModel.Path = path;
-                    if (path.Contains("itemlist"))
-                    {
 
-                    }
                     operationModel.HttpMethod = httpMethod;
                     operationModel.OperationName = operationName;
                     operationModel.ClientSuffix = document.ClientSuffix;

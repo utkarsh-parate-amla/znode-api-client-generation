@@ -10,6 +10,7 @@ using NJsonSchema;
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using System.IO;
 
 namespace NSwag.CodeGeneration.OperationNameGenerators
 {
@@ -107,11 +108,20 @@ namespace NSwag.CodeGeneration.OperationNameGenerators
                 // Check if the path starts with the base path
                 if (pathItem.Key.StartsWith(basePath, StringComparison.OrdinalIgnoreCase))
                 {
+
+                    string lastValueWithoutBraces = pathSegments
+                                .Where(segment => !segment.Contains("{"))
+                                .Last();
+
+                    string lastValueWithoutBracesOld = basePathSegments
+                                .Where(segment => !segment.Contains("{"))
+                                .Last();
+
                     // Extract parameters from the matched path (after the base path)
                     var matchedPathParams = pathSegments.Skip(2).Where(s => s.StartsWith("{") && s.EndsWith("}")).ToList();
 
                     // Compare the parameters from the provided base path with the matched path parameters
-                    if (basePathParams.Count > 1 && matchedPathParams.Count > 1 && basePathParams.SequenceEqual(matchedPathParams, StringComparer.OrdinalIgnoreCase))
+                    if (basePathParams.Count > 1 && matchedPathParams.Count > 1 && lastValueWithoutBraces == lastValueWithoutBracesOld && basePathParams.SequenceEqual(matchedPathParams, StringComparer.OrdinalIgnoreCase))
                     {
                         // Set the flag to true if both path and parameters match
                         isDuplicate = true;

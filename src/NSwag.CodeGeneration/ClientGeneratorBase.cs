@@ -198,7 +198,10 @@ namespace NSwag.CodeGeneration
                     operationModel.ControllerName = BaseSettings.OperationNameGenerator.GetClientName(document, path, httpMethod, operation);
 
                     operationModel.Path = path;
+                    if (path.Contains("bulk-quantity"))
+                    {
 
+                    }
                     operationModel.HttpMethod = httpMethod;
                     operationModel.OperationName = operationName;
                     operationModel.ClientSuffix = document.ClientSuffix;

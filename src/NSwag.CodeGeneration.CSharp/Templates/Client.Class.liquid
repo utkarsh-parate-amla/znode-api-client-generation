@@ -117,7 +117,7 @@ partial void ProcessResponse({{ HttpClientType }} client, System.Net.Http.HttpRe
 {%     if GenerateOptionalParameters == false -%}
 {% template Client.Method.Documentation %}
 {% template Client.Method.Annotations %}
-{% if operation.ClientSuffix == "v2" %}
+{% if operation.ClientSuffix != "multifront" %}
 
 {{ operation.MethodAccessModifier }} virtual {{ operation.ResultType }} {{operation.MethodType}}{{ operation.ActualOperationName }}{{ firstValue }}Async({% for parameter in operation.Parameters %}{{ parameter.Type }} {{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %})
 {% else %}
@@ -125,7 +125,7 @@ partial void ProcessResponse({{ HttpClientType }} client, System.Net.Http.HttpRe
 
 {% endif %}
 {
-{% if operation.ClientSuffix == "v2" %}
+{% if operation.ClientSuffix != "multifront" %}
 return {{ operation.MethodType}}{{ operation.ActualOperationName }}{{ firstValue }}Async({% for parameter in operation.Parameters %}{{ parameter.VariableName }}, {% endfor %}System.Threading.CancellationToken.None);
 
 {% else %}
@@ -137,7 +137,7 @@ return {{ operation.ActualOperationName }}Async({% for parameter in operation.Pa
 {% template Client.Method.Documentation %}
 {% template Client.Method.Annotations %}
 
-{% if operation.ClientSuffix == "v2" %}
+{% if operation.ClientSuffix != "multifront" %}
 
 {{ operation.MethodAccessModifier }} virtual {{ operation.SyncResultType }} {{operation.MethodType}}{{ operation.ActualOperationName }}{{ firstValue }}({% for parameter in operation.Parameters %}{{ parameter.Type }} {{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %})
 {% else %}
@@ -145,7 +145,7 @@ return {{ operation.ActualOperationName }}Async({% for parameter in operation.Pa
 
 {% endif %}
 {
-{% if operation.ClientSuffix == "v2" %}
+{% if operation.ClientSuffix != "multifront" %}
 
 {% if operation.HasResult or operation.WrapResponse %}return {% endif %}System.Threading.Tasks.Task.Run(async () => await {{operation.MethodType}}{{ operation.ActualOperationName }}{{ firstValue }}Async({% for parameter in operation.Parameters %}{{ parameter.VariableName }}, {% endfor %}System.Threading.CancellationToken.None)).GetAwaiter().GetResult();
 {% else %}
@@ -160,7 +160,7 @@ return {{ operation.ActualOperationName }}Async({% for parameter in operation.Pa
 {% template Client.Method.Documentation %}
 {% template Client.Method.Annotations %}
 
-{% if operation.ClientSuffix == "v2" %}
+{% if operation.ClientSuffix != "multifront" %}
 
 {{ operation.MethodAccessModifier }} virtual async {{ operation.ResultType }} {{operation.MethodType}}{{ operation.ActualOperationName }}{{ firstValue }}Async({% for parameter in operation.Parameters %}{{ parameter.Type }} {{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}, {% endfor %}System.Threading.CancellationToken cancellationToken{% if GenerateOptionalParameters %} = default(System.Threading.CancellationToken){% endif %})
 {% else %}

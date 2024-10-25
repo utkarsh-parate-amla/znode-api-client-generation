@@ -200,10 +200,14 @@ namespace NSwag.CodeGeneration
                     // Adding ClientSuffix logic
                     if (!string.IsNullOrEmpty(document?.ClientSuffix))
                     {
-                        path = document.ClientSuffix + "/" + path;
+                        path = "/" + path;
                     }
 
                     operationModel.Path = path;
+                    if (path.Contains("itemlist"))
+                    {
+
+                    }
                     operationModel.HttpMethod = httpMethod;
                     operationModel.OperationName = operationName;
                     operationModel.ClientSuffix = document.ClientSuffix;

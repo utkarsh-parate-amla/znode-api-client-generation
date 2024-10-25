@@ -40,16 +40,15 @@ namespace NSwag.CodeGeneration.OperationNameGenerators
         {
             var operationName = ConvertPathToName(path);
             bool isDuplicate = false;
-            if (document.ClientSuffix == "v2")
+            if (document.ClientSuffix != "multifront")
             {
                 isDuplicate = CheckForDuplicatePaths(path, document);
                 if (isDuplicate)
                 {
-                    operationName += operationName + ConversionUtilities.ConvertToUpperCamelCase(GetSecondToLastValue(path), false);
+                    operationName += ConversionUtilities.ConvertToUpperCamelCase(GetSecondToLastValue(path), false);
                 }
             }
-            if (document.ClientSuffix != "v2")
-            {
+            else { 
                 var hasNameConflict = document.Paths
                     .SelectMany(pair => pair.Value.Select(p => new { Path = pair.Key.Trim('/'), HttpMethod = p.Key, Operation = p.Value }))
                     .Where(op =>
@@ -127,9 +126,17 @@ namespace NSwag.CodeGeneration.OperationNameGenerators
         /// <returns>The operation name.</returns>
         internal static string ConvertPathToName(string path)
         {
-            return path
+            if(!path.Contains("v1") || !path.Contains("v2"))
+            {
+                return path
                 .Split('/')
                 .Where(p => !p.Contains("{") && !string.IsNullOrWhiteSpace(p))
+                .Reverse()
+                .FirstOrDefault() ?? "Index";
+            }
+            return path
+                .Split('/')
+                .Where(p => !p.Contains("{") && !string.IsNullOrWhiteSpace(p) && !(p.StartsWith("v") && p.Length == 2 && char.IsDigit(p[1])))
                 .Reverse()
                 .FirstOrDefault() ?? "Index";
         }

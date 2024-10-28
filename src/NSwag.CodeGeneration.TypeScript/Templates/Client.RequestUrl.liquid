@@ -39,11 +39,11 @@ let url_ = baseUrl + "{{ operation.Path }}{% if operation.HasQueryParameters %}{
         {% endif %}
     {% endfor -%}
 
-    {% if hasSpecialParameters %}
-        {% if operation.IsGetOrDeleteOrHead == true or  operation.IsPost == true or operation.IsPut == true -%}
-            url_ += BuildEndpointQueryString({% raw %}{{% endraw %}{% for parameter in operation.QueryParameters %} {{parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %}{% raw %}}{% endraw %});
-        {% endif -%}
-    {% endif -%}
+   {% if hasSpecialParameters %}
+    {% if operation.IsGetOrDeleteOrHead == true or operation.IsPost == true or operation.IsPut == true %}
+        url_ += BuildEndpointQueryString({% raw %}{{% endraw %}{% for parameter in operation.QueryParameters %}{% if parameter.VariableName == "expand" or parameter.VariableName == "filter" or parameter.VariableName == "sort" or parameter.VariableName == "pageSize" or parameter.VariableName == "pageIndex" %}{{parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endif %}{% endfor %}{% raw %}}{% endraw %});
+    {% endif %}
+{% endif %}
 
     {% for parameter in operation.QueryParameters -%}
         {% if parameter.IsOptional and parameter.Name != "expand" and parameter.Name != "filter" and parameter.Name != "sort" and parameter.Name != "pageIndex" and parameter.Name != "pageSize" %}

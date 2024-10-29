@@ -27,12 +27,12 @@
     
     {% template Client.Method.Documentation %}
     {% if operation.IsPost == true or operation.IsPut == true %}
-        export async function {{ operation.MethodAccessModifier }}{{ Class | replace: "Client", "" }}_{{ operation.ActualOperationName }}({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %}?{% endif %}:{% if parameter.Type contains 'string' or parameter.Type contains 'number' or parameter.Type contains 'boolean' %}{{ parameter.Type }}{% else %}Models.{{ parameter.Type }}{% endif %}{{ parameter.TypePostfix }}{% if parameter.IsLast == false %}, {% endif %}{% endfor %}{% if UseAbortSignal %}{% if operation.Parameters.size > 0 %}, {% endif %}signal?: AbortSignal | undefined{% endif %}): Promise<any> {
+        export async function {{ operation.MethodAccessModifier }}{{ Class | replace: "Client", "" }}_{{ operation.ActualOperationName }}({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %}?{% endif %}:{% if parameter.Type contains 'string' or parameter.Type contains 'number' or parameter.Type contains 'boolean' %}{{ parameter.Type }}{% else %}Models.{{ parameter.Type }}{% endif %}{{ parameter.TypePostfix }}{% if parameter.IsLast == false %}, {% endif %}{% endfor %}{% if UseAbortSignal %}{% if operation.Parameters.size > 0 %}, {% endif %}signal?: AbortSignal | undefined{% endif %}): Promise<MultifrontTypes.{{ operation.ResultType }}> {
     {%- else -%}
         {% unless containsTextInCurlyBraces %}
-export async function {{ operation.MethodAccessModifier }}{{ Class | replace: "Client", "" }}_{{ operation.ActualOperationName }}({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %}?{% endif %}:{% if parameter.Type contains 'ApplicationTypesEnum'%} Models.{{ parameter.Type }}{% else %}{{ parameter.Type }}{% endif %}{{ parameter.TypePostfix }}{% if parameter.IsLast == false %}, {% endif %}{% endfor %} {% if UseAbortSignal %}{% if operation.Parameters.size > 0 or hardcodedParameter != '' %}, {% endif %}signal?: AbortSignal | undefined{% endif %}{% if hardcodedParameter != '' %}, {{ hardcodedParameter }} | undefined{% endif %}): Promise<any> {
+export async function {{ operation.MethodAccessModifier }}{{ Class | replace: "Client", "" }}_{{ operation.ActualOperationName }}({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %}?{% endif %}:{% if parameter.Type contains 'ApplicationTypesEnum'%} Models.{{ parameter.Type }}{% else %}{{ parameter.Type }}{% endif %}{{ parameter.TypePostfix }}{% if parameter.IsLast == false %}, {% endif %}{% endfor %} {% if UseAbortSignal %}{% if operation.Parameters.size > 0 or hardcodedParameter != '' %}, {% endif %}signal?: AbortSignal | undefined{% endif %}{% if hardcodedParameter != '' %}, {{ hardcodedParameter }} | undefined{% endif %}): Promise<MultifrontTypes.{{ operation.ResultType }}> {
  {% else %}
-export async function {{ operation.MethodAccessModifier }}{{ Class | replace: "Client", "" }}_{{ operation.ActualOperationName }}{{ firstParameter }}({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %}?{% endif %}:{% if parameter.Type contains 'ApplicationTypesEnum'%} Models.{{ parameter.Type }}{% else %}{{ parameter.Type }}{% endif %}{{ parameter.TypePostfix }}{% if parameter.IsLast == false %}, {% endif %}{% endfor %}{% if UseAbortSignal %}{% if operation.Parameters.size > 0 or hardcodedParameter != '' %}, {% endif %}signal?: AbortSignal | undefined{% endif %}{% if hardcodedParameter != '' %}, {{ hardcodedParameter }} | undefined{% endif %}): Promise<any> {
+export async function {{ operation.MethodAccessModifier }}{{ Class | replace: "Client", "" }}_{{ operation.ActualOperationName }}{{ firstParameter }}({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %}?{% endif %}:{% if parameter.Type contains 'ApplicationTypesEnum'%} Models.{{ parameter.Type }}{% else %}{{ parameter.Type }}{% endif %}{{ parameter.TypePostfix }}{% if parameter.IsLast == false %}, {% endif %}{% endfor %}{% if UseAbortSignal %}{% if operation.Parameters.size > 0 or hardcodedParameter != '' %}, {% endif %}signal?: AbortSignal | undefined{% endif %}{% if hardcodedParameter != '' %}, {{ hardcodedParameter }} | undefined{% endif %}): Promise<MultifrontTypes.{{ operation.ResultType }}> {
     {% endunless %}
    {%-    endif -%}
 
@@ -89,16 +89,16 @@ export async function {{ operation.MethodAccessModifier }}{{ Class | replace: "C
         });
     }
    {% if operation.IsPost == true or operation.IsPut == true %}
-   function {{ Class | replace: "Client", "" }}_process{{ operation.ActualOperationNameUpper }}(response: Response): Promise<any> {
+   function {{ Class | replace: "Client", "" }}_process{{ operation.ActualOperationNameUpper }}(response: Response): Promise<MultifrontTypes.{{ operation.ResultType }}> {
        const status = response.status;
        {% template Client.ProcessResponse %}
   {% else %}
    {% unless containsTextInCurlyBraces %}
-  function {{ Class | replace: "Client", "" }}_process{{ operation.ActualOperationNameUpper }}(response: Response): Promise<any> {
+  function {{ Class | replace: "Client", "" }}_process{{ operation.ActualOperationNameUpper }}(response: Response): Promise<MultifrontTypes.{{ operation.ResultType }}> {
       const status = response.status;
       {% template Client.ProcessResponse %}
       {% else %}
-  function {{ Class | replace: "Client", "" }}_process{{ operation.ActualOperationNameUpper }}{{firstParameter}}(response: Response): Promise<any> {
+  function {{ Class | replace: "Client", "" }}_process{{ operation.ActualOperationNameUpper }}{{firstParameter}}(response: Response): Promise<MultifrontTypes.{{ operation.ResultType }}> {
       const status = response.status;
        {% template Client.ProcessResponse %}
        {% endunless %}

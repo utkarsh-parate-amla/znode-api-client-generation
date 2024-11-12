@@ -228,14 +228,25 @@ endpoint += BuildEndpointQueryString({{ queryParams }});
 
 {% endif %}
 
+{% assign firstParameter = true %}
+
 {% for parameter in operation.QueryParameters %}
-{% unless parameterNames contains parameter.VariableName %}
-{% if parameter.VariableName != empty %}
-endpoint += "&{{ parameter.VariableName | strip }}=" + {{ parameter.VariableName }};
-{% endif %}
-{% endunless %}
+  {% unless parameterNames contains parameter.VariableName %}
+    {% if parameter.VariableName != empty %}
+      {% if firstParameter %}
+        {% if endpoint contains '?' %}
+          {% assign firstParameter = false %}
+          endpoint += "&{{ parameter.VariableName | strip }}=" + {{ parameter.VariableName }};
+        {% else %}
+          {% assign firstParameter = false %}
+          endpoint += "?{{ parameter.VariableName | strip }}=" + {{ parameter.VariableName }};
+        {% endif %}
+      {% else %}
+        endpoint += "&{{ parameter.VariableName | strip }}=" + {{ parameter.VariableName }};
+      {% endif %}
+    {% endif %}
+  {% endunless %}
 {% endfor %}
-{% endif %}
 
 HttpResponseMessage  response_ = null;
 var disposeResponse_ = true;

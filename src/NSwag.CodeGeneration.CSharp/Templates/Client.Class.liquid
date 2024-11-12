@@ -280,6 +280,10 @@ foreach (var item_ in response_.Content.Headers)
 headers_[item_.Key] = item_.Value;
 }
 var status_ = (int)response_.StatusCode;
+if (status_ == 401 && headers_.ContainsKey("Is-JWT-Authorization") && (headers_["Is-JWT-Authorization"].FirstOrDefault()).ToString() == "true")
+{
+  throw new ZnodeException(status.ErrorCode, status.ErrorMessage, status.StatusCode);
+}
 {%     for response in operation.Responses -%}
 {%     if response.StatusCode ==  '204' -%}
 if (status_ == 204)
@@ -350,6 +354,7 @@ throw new {{ ExceptionClass }}(status.ErrorCode, status.ErrorMessage, status.Sta
 {%     endif -%}
 
 }
+
 finally
 {
 if (disposeResponse_)

@@ -247,6 +247,7 @@ endpoint += BuildEndpointQueryString({{ queryParams }});
     {% endif %}
   {% endunless %}
 {% endfor %}
+{% endif %}
 
 HttpResponseMessage  response_ = null;
 var disposeResponse_ = true;

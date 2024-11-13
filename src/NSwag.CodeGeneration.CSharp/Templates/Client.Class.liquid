@@ -196,7 +196,7 @@ endpoint += "/" + "{{ operation.Path }}";
 if ({{ parameter.VariableName }} != null)
 {% template Client.Class.PathParameter %}
 else
-endpoint = endpoint.Replace("/{{ "{" }}{{ parameter.Name }}}", string.Empty);
+endpoint =  endpoint.Replace("/{{ "{" }}{{ parameter.Name }}}", string.Empty);
 {%         else -%}
 {% template Client.Class.PathParameter %}
 {%         endif -%}
@@ -206,56 +206,38 @@ endpoint = endpoint.Replace("/{{ "{" }}{{ parameter.Name }}}", string.Empty);
 {% if operation.IsGetOrDeleteOrHead == true -%}
 {% assign queryParams = "" %}
 {% assign nullCount = 0 %}
-
-{% for name in parameterNames %}
-  {% assign param = operation.QueryParameters | where: "VariableName", name | first %}
-  {% if param != null %}
-    {% assign queryParams = queryParams | append: param.VariableName %}
-  {% else %}
-    {% assign queryParams = queryParams | append: "null" %}
-    {% assign nullCount = nullCount | plus: 1 %}
-  {% endif %}
-  {%- if forloop.last == false -%}
-    {% assign queryParams = queryParams | append: ", " %}
-  {%- endif -%}
+{% for name in parameterNames %}{% assign param = operation.QueryParameters | where: "VariableName", name | first %}{% if param != null %}{% assign queryParams = queryParams | append: param.VariableName %}{% else %}{% assign queryParams = queryParams | append: "null" %}{% assign nullCount = nullCount | plus: 1 %}{% endif %}{%- if forloop.last == false -%}{% assign queryParams = queryParams | append: ", " %}{%- endif -%}
 {% endfor %}
-
 {% if nullCount == 5 %}
   {% assign queryParams = queryParams | split: ", " | slice: 0, 4 | join: ", " %}
 {% endif %}
-
 endpoint += BuildEndpointQueryString({{ queryParams }});
-
 {% endif %}
 
-{% assign firstParameter = true %}
+{% if operation.IsGetOrDeleteOrHead == true -%}
 
+{% assign parameterNames = "expand,filter,sort,pageIndex,pageSize" | split: "," %}
 {% for parameter in operation.QueryParameters %}
-  {% unless parameterNames contains parameter.VariableName %}
-    {% if parameter.VariableName != empty %}
-      {% if firstParameter %}
-        {% if endpoint contains '?' %}
-          {% assign firstParameter = false %}
-          endpoint += "&{{ parameter.VariableName | strip }}=" + {{ parameter.VariableName }};
-        {% else %}
-          {% assign firstParameter = false %}
-          endpoint += "?{{ parameter.VariableName | strip }}=" + {{ parameter.VariableName }};
-        {% endif %}
-      {% else %}
-        endpoint += "&{{ parameter.VariableName | strip }}=" + {{ parameter.VariableName }};
-      {% endif %}
-    {% endif %}
-  {% endunless %}
+{% unless parameterNames contains parameter.VariableName %}
+endpoint += "&{{ parameter.VariableName | strip }}=" + {{ parameter.VariableName }};
+{% endunless %}
 {% endfor %}
+{% else -%}
+{% for parameter in operation.QueryParameters %}
+{% unless parameterNames contains parameter.VariableName %}
+endpoint += "?{{ parameter.VariableName | strip }}=" + {{ parameter.VariableName }};
+{% endunless %}
+{% endfor %}
+
 {% endif %}
 
+
+{% endif %}
 HttpResponseMessage  response_ = null;
 var disposeResponse_ = true;
-
 try
 {
 ApiStatus status = new ApiStatus();
-
 {%         if operation.IsGet -%}
 response_ = await GetResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
 {%         elsif operation.IsDelete -%}
@@ -273,7 +255,6 @@ response_ = await PostResourceToEndpointAsync(endpoint, null, status, cancellati
 {%         elsif operation.IsPut -%}
 response_ = await PutResourceToEndpointAsync(endpoint, JsonConvert.SerializeObject({% for parameter in operation.Parameters %}{% if forloop.last %}{{ parameter.VariableName }}{% endif %}{% endfor %}), status, cancellationToken).ConfigureAwait(false);
 {%     endif -%}
-
 var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
 if (response_.Content != null && response_.Content.Headers != null)
 {
@@ -355,16 +336,12 @@ throw new {{ ExceptionClass }}(status.ErrorCode, status.ErrorMessage, status.Sta
 {%     endif -%}
 
 }
-
 finally
 {
 if (disposeResponse_)
 response_.Dispose();
 }
 }
-
-
-
 {% endfor %}
 protected struct ObjectResponseResult<T>
 {
@@ -373,7 +350,6 @@ public ObjectResponseResult(T responseObject, string responseText)
 this.Object = responseObject;
 this.Text = responseText;
 }
-
 public T Object { get; }
 
 public string Text { get; }

@@ -256,20 +256,38 @@ try
 {
 ApiStatus status = new ApiStatus();
 
+{% capture firstParameterType %}{{ operation.Parameters[0].Type }}{% endcapture %}
+
+
 {%         if operation.IsGet -%}
 response_ = await GetResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
 {%         elsif operation.IsDelete -%}
 {% if operation.ContentParameter %}
+{% if firstParameterType contains 'FileParameter' %}
+response_ = await UploadFilesAsync(endpoint,{{ operation.ContentParameter.VariableName }}, status, cancellationToken).ConfigureAwait(false);
+{% else %}
 response_ = await PostResourceToEndpointAsync(endpoint, JsonConvert.SerializeObject({{ operation.ContentParameter.VariableName }}), status, cancellationToken).ConfigureAwait(false);
+{% endif %}
+
 {% else %}
 response_ = await DeleteResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
 {% endif %}
 {% elsif operation.IsPost -%}
 {% if operation.HasContent and operation.ContentParameter != null %}
-response_ = await PostResourceToEndpointAsync(endpoint, JsonConvert.SerializeObject({{ operation.ContentParameter.VariableName }}), status, cancellationToken).ConfigureAwait(false);
+{% if firstParameterType contains 'FileParameter' %}
+response_ = await UploadFilesAsync(endpoint,{{ operation.ContentParameter.VariableName }}, status, cancellationToken).ConfigureAwait(false);
 {% else %}
+response_ = await PostResourceToEndpointAsync(endpoint, JsonConvert.SerializeObject({{ operation.ContentParameter.VariableName }}), status, cancellationToken).ConfigureAwait(false);
+{% endif %}
+
+{% else %}
+{% if firstParameterType contains 'FileParameter' %}
+response_ = await UploadFilesAsync(endpoint,{{ operation.ContentParameter.VariableName }}, status, cancellationToken).ConfigureAwait(false);
+{% else %}x
 response_ = await PostResourceToEndpointAsync(endpoint, null, status, cancellationToken).ConfigureAwait(false);
 {% endif %}
+{% endif %}
+
 {%         elsif operation.IsPut -%}
 response_ = await PutResourceToEndpointAsync(endpoint, JsonConvert.SerializeObject({% for parameter in operation.Parameters %}{% if forloop.last %}{{ parameter.VariableName }}{% endif %}{% endfor %}), status, cancellationToken).ConfigureAwait(false);
 {%     endif -%}

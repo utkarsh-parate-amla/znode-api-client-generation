@@ -28,6 +28,13 @@ let options_: RequestInit = {
   {%- endif -%}
   {%- endif -%}
 };
+{% if operation.IsCacheRequired == true -%}
+        options_ = addCacheOption(cacheInvalidator ?? [], options_);
+    {%- else -%}
+    {%- if filterFound -%}
+        options_ = addCacheOption(filter ?? [], options_);
+    {% endif -%}
+{%- endif -%}
 {%- endif -%}
 
 let url_ = baseUrl + "{{ operation.Path }}{% if operation.HasQueryParameters %}{% endif %}";

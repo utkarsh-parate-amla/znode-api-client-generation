@@ -3,52 +3,34 @@
 
 public partial interface I{{ Class }}{% if HasClientBaseInterface %} : {{ ClientBaseInterface }}{% endif %}
 {
-    {% template Client.Interface.Body %}
-    {% for operation in InterfaceOperations -%}
-{% assign firstVariableName = "" %}
-{% assign index = 0 %}
-
-{% for parameter in operation.PathParameters %}
-    {% if index == 0 %}
-        {% assign firstVariableName = parameter.VariableName %}
-    {% endif %}
-    {% assign index = index | plus: 1 %}
-{% endfor %}
-
-{% assign capitalizedFirstVariableName = firstVariableName | capitalize %}
-
-{% if firstVariableName != "" %}
-    {% assign firstValue = "By" | append: capitalizedFirstVariableName %}
-{% else %}
-    {% assign firstValue = "" %}
-{% endif %}
-        {% if GenerateOptionalParameters == false -%}
-            {% template Client.Method.Documentation %}
-            {% template Client.Method.Annotations %}
-            {% if operation.ClientSuffix != "multifront" %}
-                {{ operation.ResultType }} {{operation.MethodType}}{{ operation.ActualOperationName }}{{ firstValue }}Async({% for parameter in operation.Parameters %}{{ parameter.Type }} {{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %});
-            {% else %}
-                {{ operation.ResultType }} {{ operation.ActualOperationName }}Async({% for parameter in operation.Parameters %}{{ parameter.Type }} {{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %});
-            {% endif %}
-        {% endif -%}
-
-        {% if GenerateSyncMethods -%}
-            {% template Client.Method.Documentation %}
-            {% template Client.Method.Annotations %}
-            {% if operation.ClientSuffix != "multifront" %}
-                {{ operation.SyncResultType }} {{operation.MethodType}}{{ operation.ActualOperationName }}{{ firstValue }}({% for parameter in operation.Parameters %}{{ parameter.Type }} {{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %});
-            {% else %}
-                {{ operation.SyncResultType }} {{ operation.ActualOperationName }}({% for parameter in operation.Parameters %}{{ parameter.Type }} {{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %});
-            {% endif %}
-        {%- endif %}
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+{% template Client.Interface.Body %}{% for operation in InterfaceOperations -%}{% assign firstVariableName = "" %}{% assign index = 0 %}{% for parameter in operation.PathParameters %}{% if index == 0 %}{% assign firstVariableName = parameter.VariableName %}{% endif %}{% assign index = index | plus: 1 %}{% endfor %}{% assign capitalizedFirstVariableName = firstVariableName | capitalize %}{% if firstVariableName != "" %}{% assign firstValue = "By" | append: capitalizedFirstVariableName %}{% else %}{% assign firstValue = "" %}{% endif %}
+    {% if GenerateOptionalParameters == false -%}
         {% template Client.Method.Documentation %}
         {% template Client.Method.Annotations %}
         {% if operation.ClientSuffix != "multifront" %}
-            {{ operation.ResultType }} {{operation.MethodType}}{{ operation.ActualOperationName }}{{ firstValue }}Async({% for parameter in operation.Parameters %}{{ parameter.Type }} {{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}, {% endfor %}System.Threading.CancellationToken cancellationToken{% if GenerateOptionalParameters %} = default(System.Threading.CancellationToken){% endif %});
+        {{ operation.ResultType }} {{operation.MethodType}}{{ operation.ActualOperationName }}{{ firstValue }}Async({% for parameter in operation.Parameters %}{{ parameter.Type }} {{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %});
         {% else %}
-            {{ operation.ResultType }} {{ operation.ActualOperationName }}Async({% for parameter in operation.Parameters %}{{ parameter.Type }} {{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}, {% endfor %}System.Threading.CancellationToken cancellationToken{% if GenerateOptionalParameters %} = default(System.Threading.CancellationToken){% endif %});
+        {{ operation.ResultType }} {{ operation.ActualOperationName }}Async({% for parameter in operation.Parameters %}{{ parameter.Type }} {{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %});
         {% endif %}
-    {% endfor -%}
+    {% endif -%}
+
+    {% if GenerateSyncMethods -%}
+        {% template Client.Method.Documentation %}
+        {% template Client.Method.Annotations %}
+        {% if operation.ClientSuffix != "multifront" %}
+        {{ operation.SyncResultType }} {{operation.MethodType}}{{ operation.ActualOperationName }}{{ firstValue }}({% for parameter in operation.Parameters %}{{ parameter.Type }} {{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %});
+        {% else %}
+        {{ operation.SyncResultType }} {{ operation.ActualOperationName }}({% for parameter in operation.Parameters %}{{ parameter.Type }} {{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}{% if parameter.IsLast == false %}, {% endif %}{% endfor %});
+        {% endif %}
+    {%- endif %}
+
+    /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+    {% template Client.Method.Documentation %}
+    {% template Client.Method.Annotations %}
+    {% if operation.ClientSuffix != "multifront" %}
+    {{ operation.ResultType }} {{operation.MethodType}}{{ operation.ActualOperationName }}{{ firstValue }}Async({% for parameter in operation.Parameters %}{{ parameter.Type }} {{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}, {% endfor %}System.Threading.CancellationToken cancellationToken{% if GenerateOptionalParameters %} = default(System.Threading.CancellationToken){% endif %});
+    {% else %}
+    {{ operation.ResultType }} {{ operation.ActualOperationName }}Async({% for parameter in operation.Parameters %}{{ parameter.Type }} {{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %} = null{% endif %}, {% endfor %}System.Threading.CancellationToken cancellationToken{% if GenerateOptionalParameters %} = default(System.Threading.CancellationToken){% endif %});
+    {% endif %}
+{% endfor -%}
 }

@@ -178,7 +178,7 @@ endpoint += "/" + "{{ operation.Path }}";
 if ({{ parameter.VariableName }} != null)
 {% template Client.Class.PathParameter %}
 else
-endpoint =  endpoint.Replace("/{{ "{" }}{{ parameter.Name }}}", string.Empty);
+endpoint = endpoint.Replace("/{{ "{" }}{{ parameter.Name }}}", string.Empty);
 {%         else -%}
 {% template Client.Class.PathParameter %}
 {%         endif -%}
@@ -225,7 +225,7 @@ response_ = await PostResourceToEndpointAsync(endpoint, JsonConvert.SerializeObj
 {% else %}
 {% if firstParameterType contains 'FileParameter' %}
 response_ = await UploadFilesAsync(endpoint,{{ operation.Parameters[0].VariableName }}, status, cancellationToken).ConfigureAwait(false);
-{% else %}x
+{% else %}
 response_ = await PostResourceToEndpointAsync(endpoint, null, status, cancellationToken).ConfigureAwait(false);
 {% endif %}
 {% endif %}

@@ -94,24 +94,9 @@ partial void PrepareRequest({{ HttpClientType }} client, System.Net.Http.HttpReq
 partial void PrepareRequest({{ HttpClientType }} client, System.Net.Http.HttpRequestMessage request, System.Text.StringBuilder urlBuilder);
 partial void ProcessResponse({{ HttpClientType }} client, System.Net.Http.HttpResponseMessage response);
 {% endif -%}
-{% for operation in Operations %}
-{% assign firstVariableName = "" %}
-{% assign index = 0 %}
-
-{% for parameter in operation.PathParameters %}
-    {% if index == 0 %}
-        {% assign firstVariableName = parameter.VariableName %}
-    {% endif %}
-    {% assign index = index | plus: 1 %}
-{% endfor %}
-
+{% for operation in Operations %}{% assign firstVariableName = "" %}{% assign index = 0 %}{% for parameter in operation.PathParameters %}{% if index == 0 %}{% assign firstVariableName = parameter.VariableName %}{% endif %}{% assign index = index | plus: 1 %}{% endfor %}
 {% assign capitalizedFirstVariableName = firstVariableName | capitalize %}
-
-{% if firstVariableName != "" %}
-    {% assign firstValue = "By" | append: capitalizedFirstVariableName %}
-{% else %}
-    {% assign firstValue = "" %}
-{% endif %}
+{% if firstVariableName != "" %}{% assign firstValue = "By" | append: capitalizedFirstVariableName %}{% else %}{% assign firstValue = "" %}{% endif %}
 {%     if GenerateOptionalParameters == false -%}
 {% template Client.Method.Documentation %}
 {% template Client.Method.Annotations %}
@@ -125,10 +110,10 @@ partial void ProcessResponse({{ HttpClientType }} client, System.Net.Http.HttpRe
 {
 {% if operation.ClientSuffix != "multifront" %}
 return {{ operation.MethodType}}{{ operation.ActualOperationName }}{{ firstValue }}Async({% for parameter in operation.Parameters %}{{ parameter.VariableName }}, {% endfor %}System.Threading.CancellationToken.None);
-
 {% else %}
 return {{ operation.ActualOperationName }}Async({% for parameter in operation.Parameters %}{{ parameter.VariableName }}, {% endfor %}System.Threading.CancellationToken.None);
-{% endif %}    }
+{% endif %}    
+}
 
 {%     endif -%}
 {%     if GenerateSyncMethods -%}
@@ -185,7 +170,6 @@ throw new System.ArgumentNullException("{{ parameter.VariableName }}");
 {%     if operation.HasContent and operation.ContentParameter.IsRequired -%}
 if ({{ operation.ContentParameter.VariableName }} == null)
 throw new System.ArgumentNullException("{{ operation.ContentParameter.VariableName }}");
-
 {%     endif -%}
 string endpoint = ZnodeAdminSettings.ZnodeApiGateway;
 endpoint += "/" + "{{ operation.Path }}";
@@ -202,35 +186,17 @@ endpoint =  endpoint.Replace("/{{ "{" }}{{ parameter.Name }}}", string.Empty);
 {% if operation.HasQueryParameters -%}
 {% assign parameterNames = "expand,filter,sort,pageIndex,pageSize" | split: "," %}
 {% if operation.IsGetOrDeleteOrHead == true -%}
-{% assign queryParams = "" %}
-{% assign nullCount = 0 %}
-{% for name in parameterNames %}{% assign param = operation.QueryParameters | where: "VariableName", name | first %}{% if param != null %}{% assign queryParams = queryParams | append: param.VariableName %}{% else %}{% assign queryParams = queryParams | append: "null" %}{% assign nullCount = nullCount | plus: 1 %}{% endif %}{%- if forloop.last == false -%}{% assign queryParams = queryParams | append: ", " %}{%- endif -%}
-{% endfor %}
-{% if nullCount == 5 %}
-  {% assign queryParams = queryParams | split: ", " | slice: 0, 4 | join: ", " %}
-{% endif %}
+{% assign queryParams = "" %}{% assign nullCount = 0 %}{% for name in parameterNames %}{% assign param = operation.QueryParameters | where: "VariableName", name | first %}{% if param != null %}{% assign queryParams = queryParams | append: param.VariableName %}{% else %}{% assign queryParams = queryParams | append: "null" %}{% assign nullCount = nullCount | plus: 1 %}{% endif %}{%- if forloop.last == false -%}{% assign queryParams = queryParams | append: ", " %}{%- endif -%}{% endfor %}
+{% if nullCount == 5 %}{% assign queryParams = queryParams | split: ", " | slice: 0, 4 | join: ", " %}{% endif %}
 endpoint += BuildEndpointQueryString({{ queryParams }});
 {% endif %}
 
 {% if operation.IsGetOrDeleteOrHead == true -%}
-
-{% assign parameterNames = "expand,filter,sort,pageIndex,pageSize" | split: "," %}
-{% for parameter in operation.QueryParameters %}
-{% unless parameterNames contains parameter.VariableName %}
+{% assign parameterNames = "expand,filter,sort,pageIndex,pageSize" | split: "," %}{% for parameter in operation.QueryParameters %}{% unless parameterNames contains parameter.VariableName %}
 endpoint += "&{{ parameter.VariableName | strip }}=" + {{ parameter.VariableName }};
-{% endunless %}
-{% endfor %}
-{% else -%}
-{% for parameter in operation.QueryParameters %}
-{% unless parameterNames contains parameter.VariableName %}
+{% endunless %}{% endfor %}{% else -%}{% for parameter in operation.QueryParameters %}{% unless parameterNames contains parameter.VariableName %}
 endpoint += "?{{ parameter.VariableName | strip }}=" + {{ parameter.VariableName }};
-{% endunless %}
-{% endfor %}
-
-{% endif %}
-
-
-{% endif %}
+{% endunless %}{% endfor %}{% endif %}{% endif %}
 HttpResponseMessage  response_ = null;
 var disposeResponse_ = true;
 try

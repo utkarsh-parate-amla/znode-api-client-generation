@@ -216,7 +216,7 @@ response_ = await GetResourceFromEndpointAsync(endpoint, status, cancellationTok
 {%         elsif operation.IsDelete -%}
 {% if operation.ContentParameter %}
         {% if fileParameterFound == 'true' %}
-response_ = await UploadFileAsync(endpoint,{{ fileParameterVariableName }}, status, cancellationToken).ConfigureAwait(false);
+response_ = await UploadFileAsync(endpoint,{{ fileParameterVariableName }}, "{{ fileParameterVariableName }}", status, cancellationToken).ConfigureAwait(false);
 {% else %}
 response_ = await PostResourceToEndpointAsync(endpoint, JsonConvert.SerializeObject({{ operation.ContentParameter.VariableName }}), status, cancellationToken).ConfigureAwait(false);
 {% endif %}
@@ -226,13 +226,13 @@ response_ = await DeleteResourceFromEndpointAsync(endpoint, status, cancellation
 {% elsif operation.IsPost -%}
 {% if operation.HasContent and operation.ContentParameter != null %}
         {% if fileParameterFound == 'true' %}
-response_ = await UploadFileAsync(endpoint,{{ fileParameterVariableName }}, status, cancellationToken).ConfigureAwait(false);
+response_ = await UploadFileAsync(endpoint,{{ fileParameterVariableName }}, "{{ fileParameterVariableName }}", status, cancellationToken).ConfigureAwait(false);
 {% else %}
 response_ = await PostResourceToEndpointAsync(endpoint, JsonConvert.SerializeObject({{ operation.ContentParameter.VariableName }}), status, cancellationToken).ConfigureAwait(false);
 {% endif %}
 {% else %}
         {% if fileParameterFound == 'true' %}
-response_ = await UploadFileAsync(endpoint,{{ fileParameterVariableName }}, status, cancellationToken).ConfigureAwait(false);
+response_ = await UploadFileAsync(endpoint,{{ fileParameterVariableName }}, "{{ fileParameterVariableName }}", status, cancellationToken).ConfigureAwait(false);
 {% else %}
 response_ = await PostResourceToEndpointAsync(endpoint, null, status, cancellationToken).ConfigureAwait(false);
 {% endif %}

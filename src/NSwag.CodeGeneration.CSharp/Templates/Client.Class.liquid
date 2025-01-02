@@ -202,15 +202,7 @@ var disposeResponse_ = true;
 try
 {
 ApiStatus status = new ApiStatus();
-{% capture fileParameterFound %}false{% endcapture %}
-{% capture fileParameterVariableName %}""{% endcapture %}
-
-{% for parameter in operation.Parameters %}
-    {% if parameter.Type contains 'FileParameter' %}
-        {% capture fileParameterFound %}true{% endcapture %}
-        {% capture fileParameterVariableName %}{{ parameter.VariableName }}{% endcapture %}
-    {% endif %}
-{% endfor %}
+{% capture fileParameterFound %}false{% endcapture %}{% capture fileParameterVariableName %}""{% endcapture %}{% for parameter in operation.Parameters %} {% if parameter.Type contains 'FileParameter' %} {% capture fileParameterFound %}true{% endcapture %}{% capture fileParameterVariableName %}{{ parameter.VariableName }}{% endcapture %}{% endif %}{% endfor %}
 {%         if operation.IsGet -%}
 response_ = await GetResourceFromEndpointAsync(endpoint, status, cancellationToken).ConfigureAwait(false);
 {%         elsif operation.IsDelete -%}

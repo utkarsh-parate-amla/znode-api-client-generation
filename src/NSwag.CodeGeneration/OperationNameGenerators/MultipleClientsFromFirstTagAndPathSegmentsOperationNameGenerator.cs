@@ -41,29 +41,59 @@ namespace NSwag.CodeGeneration.OperationNameGenerators
         {
             var operationName = ConvertPathToName(path);
             bool isDuplicate = false;
-            if (document.ClientSuffix != "multifront")
-            {
-                isDuplicate = CheckForDuplicatePaths(path, document);
-                if (isDuplicate)
-                {
-                    operationName += ConversionUtilities.ConvertToUpperCamelCase(GetSecondToLastValue(path), false);
-                }
-            }
-            else { 
-                var hasNameConflict = document.Paths
-                    .SelectMany(pair => pair.Value.Select(p => new { Path = pair.Key.Trim('/'), HttpMethod = p.Key, Operation = p.Value }))
-                    .Where(op =>
-                        GetClientName(document, op.Path, op.HttpMethod, op.Operation) == GetClientName(document, path, httpMethod, operation) &&
-                        ConvertPathToName(op.Path) == operationName
-                    ).ToList()
-                    .Count > 1;
 
-                if (hasNameConflict)
+            if (document.OutPutFilePathTypeScript.EndsWith(".ts"))
+            {
+                if (document.ClientSuffix == "v2")
                 {
-                    operationName += ConversionUtilities.ConvertToUpperCamelCase(httpMethod, false);
+                    isDuplicate = CheckForDuplicatePaths(path, document);
+                    if (isDuplicate)
+                    {
+                        operationName += operationName + ConversionUtilities.ConvertToUpperCamelCase(GetSecondToLastValue(path), false);
+                    }
+                }
+                if (document.ClientSuffix != "v2")
+                {
+                    var hasNameConflict = document.Paths
+                        .SelectMany(pair => pair.Value.Select(p => new { Path = pair.Key.Trim('/'), HttpMethod = p.Key, Operation = p.Value }))
+                        .Where(op =>
+                            GetClientName(document, op.Path, op.HttpMethod, op.Operation) == GetClientName(document, path, httpMethod, operation) &&
+                            ConvertPathToName(op.Path) == operationName
+                        ).ToList()
+                        .Count > 1;
+
+                    if (hasNameConflict)
+                    {
+                        operationName += ConversionUtilities.ConvertToUpperCamelCase(httpMethod, false);
+                    }
                 }
             }
-            
+            else {
+                if (document.ClientSuffix != "multifront")
+                {
+                    isDuplicate = CheckForDuplicatePaths(path, document);
+                    if (isDuplicate)
+                    {
+                        operationName += ConversionUtilities.ConvertToUpperCamelCase(GetSecondToLastValue(path), false);
+                    }
+                }
+                else {
+                    var hasNameConflict = document.Paths
+                        .SelectMany(pair => pair.Value.Select(p => new { Path = pair.Key.Trim('/'), HttpMethod = p.Key, Operation = p.Value }))
+                        .Where(op =>
+                            GetClientName(document, op.Path, op.HttpMethod, op.Operation) == GetClientName(document, path, httpMethod, operation) &&
+                            ConvertPathToName(op.Path) == operationName
+                        ).ToList()
+                        .Count > 1;
+
+                    if (hasNameConflict)
+                    {
+                        operationName += ConversionUtilities.ConvertToUpperCamelCase(httpMethod, false);
+                    }
+                    operationName += ConversionUtilities.ConvertToUpperCamelCase(httpMethod, false);
+
+                }
+            }
             return operationName;
         }
 

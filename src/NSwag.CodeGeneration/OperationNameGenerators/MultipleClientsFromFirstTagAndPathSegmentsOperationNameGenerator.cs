@@ -68,7 +68,8 @@ namespace NSwag.CodeGeneration.OperationNameGenerators
                     }
                 }
             }
-            else {
+            else
+            {
                 if (document.ClientSuffix != "multifront")
                 {
                     isDuplicate = CheckForDuplicatePaths(path, document);
@@ -77,7 +78,8 @@ namespace NSwag.CodeGeneration.OperationNameGenerators
                         operationName += ConversionUtilities.ConvertToUpperCamelCase(GetSecondToLastValue(path), false);
                     }
                 }
-                else {
+                else
+                {
                     var hasNameConflict = document.Paths
                         .SelectMany(pair => pair.Value.Select(p => new { Path = pair.Key.Trim('/'), HttpMethod = p.Key, Operation = p.Value }))
                         .Where(op =>
@@ -90,10 +92,10 @@ namespace NSwag.CodeGeneration.OperationNameGenerators
                     {
                         operationName += ConversionUtilities.ConvertToUpperCamelCase(httpMethod, false);
                     }
-                    operationName += ConversionUtilities.ConvertToUpperCamelCase(httpMethod, false);
-
                 }
+
             }
+
             return operationName;
         }
 
